@@ -48,20 +48,6 @@ async function getProjectStatus(req, res) {
   res.json(status)
 }
 
-/**
- * Push project to GitHub
- */
-async function pushProject(req, res) {
-  const userId = SessionManager.getLoggedInUserId(req.session)
-  const { Project_id: projectId } = req.params
-
-  try {
-    await GitHubSyncHandler.promises.pushProjectToGitHub(projectId, userId)
-    res.json({ success: true })
-  } catch (error) {
-    res.status(400).json({ error: error.message })
-  }
-}
 
 
 
@@ -192,7 +178,6 @@ export default {
   completeRegistration: expressify(completeRegistration),
   listRepos: expressify(listRepos),
   getProjectStatus: expressify(getProjectStatus),
-  pushProject: expressify(pushProject),
   importRepo: expressify(importRepo),
   exportProject: expressify(exportProject),
   getUnmergedCommits: expressify(getUnmergedCommits),

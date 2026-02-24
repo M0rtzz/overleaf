@@ -43,11 +43,7 @@ async function verifyPat(pat) {
 }
 
 /**
- * List repositories for the authenticated user
- * @param {string} pat - Personal Access Token
- * @param {number} [page=1] - Page number
- * @param {number} [perPage=100] - Results per page
- * @returns {Promise<Array<{owner: string, name: string, fullName: string, private: boolean, defaultBranch: string}>>}
+ * List 100 repositories for the authenticated user
  */
 async function listRepos(pat, page = 1, perPage = 100) {
   const params = new URLSearchParams({
@@ -69,19 +65,16 @@ async function listRepos(pat, page = 1, perPage = 100) {
   }
 
   let repos = await response.json()
-  const linkHeader = response.headers.get('link')
-  logger.debug({ linkHeader }, 'GitHub API Link header for pagination')  
 
   return repos.map(repo => ({
-    // owner: repo.owner.login,
     name: repo.name,
     fullName: repo.full_name,
-    // private: repo.private,
-    // defaultBranch: repo.default_branch,
   }))
 }
 
-
+/**
+ * List All repositories for the authenticated user
+ */
 async function listAllRepos(pat) {
   let page = 1
   const perPage = 100
@@ -96,69 +89,8 @@ async function listAllRepos(pat) {
 }
 
 
-/**
- * List branches for a repository
- * @param {string} pat - Personal Access Token
- * @param {string} owner - Repository owner
- * @param {string} repo - Repository name
- * @returns {Promise<Array<{name: string, protected: boolean}>>}
- */
-async function listBranches(pat, owner, repo) {
-  const response = await fetch(
-    `${GITHUB_API_BASE}/repos/${owner}/${repo}/branches`,
-    {
-      headers: getHeaders(pat),
-    }
-  )
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Repository not found')
-    }
-    throw new Error(`GitHub API error: ${response.status}`)
-  }
-
-  const branches = await response.json()
-  return branches.map(branch => ({
-    name: branch.name,
-    protected: branch.protected,
-  }))
-}
-
-/**
- * Check if a repository exists and user has access
- * @param {string} pat - Personal Access Token
- * @param {string} owner - Repository owner
- * @param {string} repo - Repository name
- * @returns {Promise<{exists: boolean, hasWriteAccess: boolean, defaultBranch: string}>}
- */
-async function checkRepoAccess(pat, owner, repo) {
-  const response = await fetch(
-    `${GITHUB_API_BASE}/repos/${owner}/${repo}`,
-    {
-      headers: getHeaders(pat),
-    }
-  )
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      return { exists: false, hasWriteAccess: false, defaultBranch: null }
-    }
-    throw new Error(`GitHub API error: ${response.status}`)
-  }
-
-  const repoData = await response.json()
-  return {
-    exists: true,
-    hasWriteAccess: repoData.permissions?.push ?? false,
-    defaultBranch: repoData.default_branch,
-  }
-}
-
 export default {
   verifyPat,
   listRepos,
   listAllRepos,
-  listBranches,
-  checkRepoAccess,
 }
