@@ -1,6 +1,6 @@
 import express from 'express'
 import GitHubSyncController from './GitHubSyncController.js'
-import { projectConcurrencyMiddleware, releaseProjectLimiter } from './GitHubSyncMiddleware.js'
+import { projectConcurrencyMiddleware } from './GitHubSyncMiddleware.js'
 
 export function createServer() {
   const app = express()
@@ -14,17 +14,20 @@ export function createServer() {
     res.sendStatus(204)
   })
 
+  // Export a existing project to GitHub
   app.post('/project/:Project_id/user/:user_id/export',
     projectConcurrencyMiddleware,
     GitHubSyncController.exportProjectToGithub,
-    releaseProjectLimiter
   )
 
+  app.post('/project/:Project_id/user/:user_id/merge',
+    projectConcurrencyMiddleware,
+    GitHubSyncController.mergeToGitHubAndPushback,
+  )
 
   app.get('/project/:Project_id/user/:user_id/dev',
     projectConcurrencyMiddleware,
     GitHubSyncController.dev,
-    releaseProjectLimiter
   )
 
   return { app, server: app }

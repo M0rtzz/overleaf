@@ -228,6 +228,43 @@ async function exchangeCodeForPat(code) {
   return data
 }
 
+async function listCommitsSince(pat, fullName, branch, sinceCommitSha) {
+  logger.info({ fullName, branch, sinceCommitSha }, 'Listing commits since last sync')
+
+  if (!sinceCommitSha) {
+    return []
+  }
+
+  const url = `${GITHUB_API_BASE}/repos/${fullName}/compare/` +
+    `${encodeURIComponent(sinceCommitSha)}...${encodeURIComponent(branch)}`
+
+  const response = await fetch(url, {
+    headers: getHeaders(pat),
+    agent: httpsAgent,
+  })
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Repository not found or access denied')
+    }
+    throw new Error(`GitHub API error: ${response.status}`)
+  }
+
+  const data = await response.json()
+
+  const commits = (data.commits || []).map(c => ({
+    message: c.commit?.message || '',
+    author: {
+      name: c.commit?.author?.name || '',
+      email: c.commit?.author?.email || '',
+      date: c.commit?.author?.date || '',
+    },
+    sha: c.sha,
+  }))
+
+  return commits
+}
+
 export default {
   exchangeCodeForPat,
   verifyPat,
@@ -237,4 +274,5 @@ export default {
   listOrgs,
   listUser,
   getRepoInfo,
+  listCommitsSince,
 }

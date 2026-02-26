@@ -28,8 +28,8 @@ async function getProjectGitHubSyncStatus(projectId) {
   const projectStatus = await GitHubSyncProjectStates.findOne({ projectId }, 
     { 
       _id: 0, __v: 0, 
-      last_sync_sha: 0, 
-      last_sync_version: 0,
+      // last_sync_sha: 0, 
+      // last_sync_version: 0,
     }
   ).lean()
   if (!projectStatus) {
@@ -165,11 +165,20 @@ async function exportProjectToGitHub(userId, projectId, name, description, isPri
   })
 
   if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`GitHub Sync Service error: ${response.status} - ${errorText}`)
+    const error = await response.json()
+    throw new Error(`GitHub Sync Service error: ${response.status} - ${error.error || error}`)
   }
 
   return await response.json()
+}
+
+
+async function listCommitsSince(userId, repoFullName, branch, since) {
+  const pat = await getGitHubAccessTokenForUser(userId)
+  if (!pat) {
+    throw new Error('GitHub not connected')
+  }
+  return await GitHubApiClient.listCommitsSince(pat, repoFullName, branch, since)
 }
 
 export default {
@@ -186,5 +195,6 @@ export default {
     saveNewlySyncedProjectState,
     getGitHubOrgsForUser,
     exportProjectToGitHub,
+    listCommitsSince
   },
 }

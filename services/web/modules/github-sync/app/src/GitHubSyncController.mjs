@@ -61,6 +61,12 @@ async function getProjectStatus(req, res) {
     if (owner) {
       status.owner = owner
     }
+
+    // remove status. last_sync_sha and .last_sync_version
+    if (status.last_sync_sha)
+      delete status.last_sync_sha
+    if (status.last_sync_version)
+      delete status.last_sync_version
   }
   res.json(status)
 }
@@ -202,6 +208,8 @@ async function unlink(req, res) {
 
 /**
  * Export changes to Github.
+ * This will create a new repository on GitHub, and link the project to that repository.
+ * Since this operation is invoked by loggenin user, we will use this to sync.
  */
 async function exportProject(req, res){
   const userId = SessionManager.getLoggedInUserId(req.session)
@@ -230,8 +238,42 @@ async function exportProject(req, res){
   }
 }
 
+/**
+ * Get unmerged commits from GitHub and show in Overleaf, 
+ * so user can choose to merge or not.
+ * Since this operation is invoked by any editor of the project, we will
+ * use githubSyncStatus's owner to get
+ */
 async function getUnmergedCommits(req, res){
+  const { Project_id: projectId } = req.params
+  const projectStatus = await GitHubSyncHandler.promises.getProjectGitHubSyncStatus(projectId)
 
+  if (!projectStatus) {
+    return res.status(400).json({ error: 'Project is not linked to a GitHub repository' })
+  }
+
+  const ownerId = projectStatus.ownerId
+  const lastSyncSha = projectStatus.last_sync_sha
+  const repo = projectStatus.repo
+  const defaultBranch = projectStatus.default_branch
+  const crentials = await GitHubSyncHandler.promises.getGitHubAccessTokenForUser(ownerId)
+  if (!crentials) {
+    return res.status(400).json({ error: 'GitHub credentials not found for project owner' })
+  }
+
+  try {
+    logger.debug({ lastSyncSha }, 'Getting commits since last sync')
+    let commits = await GitHubSyncHandler.promises.listCommitsSince(
+      ownerId, repo, defaultBranch, lastSyncSha
+    )
+    res.json({ 
+      diverged: projectStatus.merge_status === 'failure',
+      commits:  commits
+    })
+  } catch (error) {
+    logger.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Error listing commits since last sync')
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' })
+  }
 }
 
 async function mergeFromGitHub(req, res){

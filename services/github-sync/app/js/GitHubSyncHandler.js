@@ -55,7 +55,7 @@ async function createRepositoryOnGitHub(userId, repoName, repoDescription, isPri
   if (!response.ok) {
     const errorData = await response.json()
     logger.error('Failed to create GitHub repository', { userId, repoName, error: errorData })
-    throw new Error(`GitHub API error: ${errorData.message}`)
+    throw new Error(`Repository creation failed.`)
   }
 
   const repoData = await response.json()
@@ -256,7 +256,7 @@ async function initializeRepositoryForProject(projectId, userId, repoFullName, d
 
     // // Then, we need to create a tree with all the blobs, and create a commit with the tree, and finally update the ref of the repo to point to the new commit.
     const treeSha = await createTreeOnGitHub(repoFullName, blobShas, accessToken)
-    const commitSha = await createCommitOnGitHub(repoFullName, treeSha, `Initial commit for project ${projectId}`, accessToken)
+    const commitSha = await createCommitOnGitHub(repoFullName, treeSha, `Initial Overleaf Import`, accessToken)
 
     const updateRefResult = await forceUpdateBranchToCommit(repoFullName, defaultBranch, commitSha, accessToken)
     
