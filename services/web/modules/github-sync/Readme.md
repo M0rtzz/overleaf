@@ -18,7 +18,7 @@ POST /github-sync/unlink
 Result: just refresh page after success.
 
 
-#### 02. Import Project from Github
+#### 02. Import Project from Github (Finished in web/modules)
 
 In project list page, we can select import from github, it should shows all repos.
 ```
@@ -37,7 +37,7 @@ GET: /user/github-sync/repos
 }
 ```
 
-
+After select a repo, we can create a new project with that repo, it will import all files in that repo to the new project, and link that repo to the project.
 ```
 POST: `/project/new/github-sync`
 {"projectName":"auto-overleaf","repo":"ayaka-notes/auto-overleaf"}
@@ -49,10 +49,15 @@ API return:
 ```
 
 #### 03. Publish new project to github
+In a created project, we can export a project to github(create a new repo, and export current project to that repo).
 ```
 POST: /project/699b0ea46161d1787ce2329b/github-sync/export
 {name: "internal-test", description: "internal-test", private: true, org: "ayaka-notes"}
 ```
+
+Check if user has github sync feature, if user has, we will return github sync status.
+- enabled: if user hase linked github account
+- available: if paid user(we set to true currently)
 
 ```
 GET: /user/github-sync/status # check if paid user
@@ -74,15 +79,24 @@ When there are no conflict, we will just merge the change, delete the exported b
 Once sync point is determined, we will fetch all changed files since last sync point, and then we will replace all of those files in overleaf with the content in github, and then we will update sync point to latest commit.
 
 Get github sync status, including if github sync enabled, merge status, repo info, unmerged branch info and owner info.
+
+Check project github sync status, including if github sync enabled, merge status, repo info, unmerged branch info and owner info.
 ```
 GET /project/699b0ea46161d1787ce2329b/github-sync/status
 {
+    <!-- if github sync enabled for this project -->
     "enabled": true,
+    <!-- if last sync was successful -->
+    <!-- if last sync unsuccessful, it will be "failure" -->
     "merge_status": "success",
+    <!-- Github repo -->
     "repo": "ayaka-notes/internal-test",
+    <!-- if merged conflice -->
     "unmerged_branch": null,
-    "owner_id": "698bf0400fb804ce63648e1a",
-    "owner": {
+    <!-- owner_id for next onwer -->
+    "owner_id": "698bf0400fb804ce63648e1a", 
+    <!-- owner info, used for commit and show in UI -->
+    "owner": { 
         "_id": "698bf0400fb804ce63648e1a",
         "email": "xxxx@outlook.in",
         "githubFeature": {
@@ -94,11 +108,14 @@ GET /project/699b0ea46161d1787ce2329b/github-sync/status
 ```
 
 Pull github's change (maybe some changes Since last sync point)
+Authorization: shared user with read/write can commit changes.
 ```
 GET /project/699b0ea46161d1787ce2329b/github-sync/commits/unmerged
 {diverged: false, commits: []}
 {
+    <!-- if last merge_status is failure, diverge is true -->
     "diverged": false,
+    <!-- commits since last sync point -->
     "commits": [
         {
             "message": "Update main.tex",
@@ -146,8 +163,9 @@ GET /project/699b0ea46161d1787ce2329b/github-sync/commits/unmerged
 }
 ```
 
-User commit overleaf's change to github.
+User commit overleaf's change to github. 
+Authorization: shared user with read/write can commit changes.
 ```
-POST /github-sync/merge
+POST /project/699c54c33e4bb0e9c15e00c4/github-sync/merge
 {message: "123123123"}
 ```

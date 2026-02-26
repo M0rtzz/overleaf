@@ -1,7 +1,14 @@
 import logger from '@overleaf/logger'
 import fetch from 'node-fetch'
+import Settings from '@overleaf/settings'
+import HttpsProxyAgent from 'https-proxy-agent'
 
 const GITHUB_API_BASE = 'https://api.github.com'
+
+// For example: 'http://127.0.0.1:1080'
+const proxyUrl = process.env.GITHUB_SYNC_PROXY_URL
+const httpsAgent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined
+
 
 /**
  * Create headers for GitHub API requests
@@ -25,6 +32,7 @@ function getHeaders(pat) {
 async function verifyPat(pat) {
   const response = await fetch(`${GITHUB_API_BASE}/user`, {
     headers: getHeaders(pat),
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -57,6 +65,7 @@ async function listRepos(pat, page = 1, perPage = 100) {
     `${GITHUB_API_BASE}/user/repos?${params.toString()}`,
     {
       headers: getHeaders(pat),
+      agent: httpsAgent,
     }
   )
 
@@ -88,9 +97,144 @@ async function listAllRepos(pat) {
   return allRepos
 }
 
+/**
+ * Get repository info
+ * @param {string} pat - Personal Access Token
+ * @param {string} fullName - Full repository name (e.g. "owner/repo")
+ * @returns {Promise<{fullName: string, defaultBranch: string, latestCommitSha: string}>}
+ */
+async function getRepoInfo(pat, fullName) {
+  const response = await fetch(`${GITHUB_API_BASE}/repos/${fullName}`, {
+    headers: getHeaders(pat),
+    agent: httpsAgent,
+  })
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Repository not found or access denied')
+    }
+    throw new Error(`GitHub API error: ${response.status}`)
+  }
+
+  const repo = await response.json()
+  const defaultBranch = repo.default_branch
+
+  const branchResp = await fetch(
+    `${GITHUB_API_BASE}/repos/${fullName}/branches/${encodeURIComponent(defaultBranch)}`,
+    { headers: getHeaders(pat), agent: httpsAgent }
+  )
+
+  if (!branchResp.ok) {
+    throw new Error(`GitHub API error: ${branchResp.status}`)
+  }
+
+  const branch = await branchResp.json()
+
+  return {
+    fullName: repo.full_name,
+    defaultBranch: repo.default_branch,
+    latestCommitSha: branch.commit?.sha,
+  }
+}
+
+async function listOrgs(pat) {
+  const response = await fetch(`${GITHUB_API_BASE}/user/orgs`, {
+    headers: getHeaders(pat),
+    agent: httpsAgent,
+  })
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`)
+  }
+
+  const orgs = await response.json()
+  return orgs.map(org => ({
+    login: org.login,
+  }))
+}
+
+async function listUser(pat) {
+  const response = await fetch(`${GITHUB_API_BASE}/user`, {
+    headers: getHeaders(pat),
+    agent: httpsAgent,
+  })
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`)
+  }
+
+  const user = await response.json()
+
+  return {
+    login: user.login
+  }
+}
+
+async function revokePat(token) {
+  const ULR = `${GITHUB_API_BASE}/applications/${Settings.githubSync.clientID}/token`
+  const clientId = Settings.githubSync.clientID
+  const clientSecret = Settings.githubSync.clientSecret
+
+  if (!clientId || !clientSecret) {
+    logger.warn('GitHub client ID or secret not configured, skipping token revocation')
+    return
+  }
+
+  const Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+  const resp = await fetch(ULR, {
+    method: 'DELETE',
+    agent: httpsAgent,
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': Authorization,
+    },
+    body: JSON.stringify({ access_token: token }),
+  })
+
+  if (!resp.ok) {
+    logger.warn(`Failed to revoke GitHub token: ${resp.status} ${await resp.text()}`)
+  }
+}
+
+
+
+// This function would exchange the OAuth code for an access token with GitHub
+// For security, this should be done server-side and not exposed to the client
+// The implementation would involve making a POST request to GitHub's token endpoint
+// with the client ID, client secret, and the code received from the OAuth callback
+async function exchangeCodeForPat(code) {
+  const resp = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    agent: httpsAgent,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: Settings.githubSync.clientID,
+      client_secret: Settings.githubSync.clientSecret,
+      code,
+      redirect_uri: Settings.githubSync.callbackURL,
+    }),
+  })
+
+  const data = await resp.json()
+  if (!resp.ok || data.error) {
+    throw new Error(
+      `GitHub token exchange failed: ${data.error || resp.status} ${data.error_description || ''}`.trim()
+    )
+  }
+
+  return data
+}
 
 export default {
+  exchangeCodeForPat,
   verifyPat,
+  revokePat,
   listRepos,
   listAllRepos,
+  listOrgs,
+  listUser,
+  getRepoInfo,
 }

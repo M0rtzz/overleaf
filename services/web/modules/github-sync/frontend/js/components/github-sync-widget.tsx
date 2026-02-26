@@ -2,13 +2,9 @@ import { useCallback, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   postJSON,
-  deleteJSON,
   getJSON,
 } from '../../../../../frontend/js/infrastructure/fetch-json'
 import OLButton from '@/shared/components/ol/ol-button'
-import OLFormGroup from '@/shared/components/ol/ol-form-group'
-import OLFormControl from '@/shared/components/ol/ol-form-control'
-import OLFormLabel from '@/shared/components/ol/ol-form-label'
 import {
   OLModal,
   OLModalBody,
@@ -29,9 +25,7 @@ export default function GitHubSyncWidget() {
   const [status, setStatus] = useState<GitHubStatus>({ available: false, enabled: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [showConnectModal, setShowConnectModal] = useState(false)
   const [showDisconnectModal, setShowDisconnectModal] = useState(false)
-  const [connecting, setConnecting] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
 
   const fetchStatus = useCallback(async () => {
@@ -49,8 +43,6 @@ export default function GitHubSyncWidget() {
   useEffect(() => {
     fetchStatus()
   }, [fetchStatus])
-
-
 
   const handleDisconnect = useCallback(async () => {
     setDisconnecting(true)

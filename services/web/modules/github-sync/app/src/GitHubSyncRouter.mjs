@@ -21,6 +21,14 @@ export default {
       GitHubSyncController.beginAuth
     )
 
+    // Get user's Github org
+    webRouter.get(
+      '/user/github-sync/orgs',
+      AuthenticationController.requireLogin(),
+      GitHubSyncController.listOrgs
+    )
+
+
     // OAuth callback for GitHub registration flow
     webRouter.get(
       '/github-sync/completeRegistration',
@@ -48,7 +56,7 @@ export default {
     webRouter.post(
       '/project/:Project_id/github-sync/export',
       AuthenticationController.requireLogin(),
-      AuthorizationMiddleware.ensureUserCanAdminProject,
+      AuthorizationMiddleware.ensureUserCanWriteProjectContent,
       GitHubSyncController.exportProject
     )
 
@@ -63,7 +71,7 @@ export default {
     webRouter.get(
       '/project/:Project_id/github-sync/commits/unmerged',
       AuthenticationController.requireLogin(),
-      AuthorizationMiddleware.ensureUserCanAdminProject,
+      AuthorizationMiddleware.ensureUserCanWriteProjectContent,
       GitHubSyncController.getUnmergedCommits
     )
 
@@ -73,7 +81,7 @@ export default {
     webRouter.post(
       '/project/:Project_id/github-sync/merge',
       AuthenticationController.requireLogin(),
-      AuthorizationMiddleware.ensureUserCanAdminProject,
+      AuthorizationMiddleware.ensureUserCanWriteProjectContent,
       GitHubSyncController.mergeFromGitHub
     )
 

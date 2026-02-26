@@ -1,6 +1,7 @@
 import { Project } from '../../../../app/src/models/Project.mjs'
 import GitHubApiClient from './GitHubApiClient.mjs'
 import { GitHubSyncUserCredentials } from '../models/githubSyncUserCredentials.mjs'
+import { GitHubSyncProjectStates } from '../models/githubSyncProjectStates.mjs'
 import Settings from '@overleaf/settings'
 import logger from '@overleaf/logger'
 import SecretsHelper from './SecretsHelper.mjs'
@@ -20,7 +21,23 @@ async function getUserGitHubStatus(userId) {
   }
 }
 
-
+/**
+ * Get project's GitHub sync status
+ */
+async function getProjectGitHubSyncStatus(projectId) {
+  const projectStatus = await GitHubSyncProjectStates.findOne({ projectId }, 
+    { 
+      _id: 0, __v: 0, 
+      last_sync_sha: 0, 
+      last_sync_version: 0,
+    }
+  ).lean()
+  if (!projectStatus) {
+    return { enabled: false }
+  }
+  projectStatus.enabled = true
+  return projectStatus
+}
 
 /**
  * List user's GitHub repositories
@@ -37,27 +54,15 @@ async function listUserRepos(userId) {
 }
 
 
-
-
 /**
- * Get project's GitHub sync status
- * @param {string} projectId - Project ID
- * @returns {Promise<Object>}
+ * Get project's GitHub sync status, directly from db.
  */
 async function getProjectSyncStatus(projectId) {
-  const project = await Project.findById(projectId, 'githubSync').lean()
-
-  if (!project?.githubSync?.enabled) {
-    return { configured: false }
+  const projectStatus = await GitHubSyncProjectStates.findOne({ projectId }, { _id: 0, __v: 0 }).lean()
+  if (!projectStatus) {
+    return { enabled: false }
   }
-
-  return {
-    configured: true,
-    repoOwner: project.githubSync.repoOwner,
-    repoName: project.githubSync.repoName,
-    branch: project.githubSync.branch,
-    lastSyncedAt: project.githubSync.lastSyncedAt,
-  }
+  return projectStatus
 }
 
 
@@ -66,29 +71,8 @@ async function getProjectSyncStatus(projectId) {
 // The implementation would involve making a POST request to GitHub's token endpoint
 // with the client ID, client secret, and the code received from the OAuth callback
 async function exchangeCodeForToken(code) {
-  const resp = await fetch('https://github.com/login/oauth/access_token', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      client_id: Settings.githubSync.clientID,
-      client_secret: Settings.githubSync.clientSecret,
-      code,
-      redirect_uri: Settings.githubSync.callbackURL,
-    }),
-  })
 
-  const data = await resp.json()
-  if (!resp.ok || data.error) {
-    throw new Error(
-      `GitHub token exchange failed: ${data.error || resp.status} ${data.error_description || ''}`.trim()
-    )
-  }
-
-  // data: { access_token, token_type, scope, (maybe expires_in/refresh_token...) }
-  return data
+  return await GitHubApiClient.exchangeCodeForToken(code)
 }
 
 // Save the GitHub access token for a user, encrypted in the database
@@ -103,6 +87,22 @@ async function saveGitHubAccessTokenForUser(userId, accessToken) {
   await gitHubSyncUserCredentials.save()
 }
 
+// Save githubSyncProjectStates for a project
+async function saveNewlySyncedProjectState(projectId, ownerId, repo, sha, branch, ver) {
+  let gitHubSyncProjectStates = new GitHubSyncProjectStates()
+  gitHubSyncProjectStates.projectId = projectId
+  gitHubSyncProjectStates.ownerId = ownerId
+  gitHubSyncProjectStates.repo = repo
+  gitHubSyncProjectStates.merge_status = 'success'
+  gitHubSyncProjectStates.last_sync_sha = sha
+  gitHubSyncProjectStates.default_branch = branch
+  gitHubSyncProjectStates.last_sync_sha = sha
+  gitHubSyncProjectStates.last_sync_version = ver
+  await gitHubSyncProjectStates.save()
+}
+
+
+
 /**
  * Remove a user's GitHub access token from the database.
  * Revokes the token with GitHub before deleting it locally.(try)
@@ -111,23 +111,8 @@ async function saveGitHubAccessTokenForUser(userId, accessToken) {
 async function removeGitHubAccessTokenForUser(userId) {
   let token = await getGitHubAccessTokenForUser(userId)
   if (token) {
-    let URL = `https://api.github.com/applications/${Settings.githubSync.clientID}/token`
-    let Authorization = `Basic ${Buffer.from(`${Settings.githubSync.clientID}:${Settings.githubSync.clientSecret}`).toString('base64')}`
-    // Revoke token with GitHub
-    const resp = await fetch(URL, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': Authorization,
-      },
-      body: JSON.stringify({ access_token: token }),
-    })
-
-    if (!resp.ok) {
-      logger.warn(`Failed to revoke GitHub token for user ${userId}: ${resp.status} ${await resp.text()}`)
-    }
+    await GitHubApiClient.revokePat(token)
   }
-
   await GitHubSyncUserCredentials.deleteMany({ userId })
 }
 
@@ -143,15 +128,63 @@ async function getGitHubAccessTokenForUser(userId) {
   return await SecretsHelper.decryptAccessToken(credentials.auth_token_encrypted)
 }
 
+/**
+ * Get a repo's basic info
+ * @param {string} userId - User ID
+ */
+async function getRepoInfo(userId, repoFullName) {
+  const pat = await getGitHubAccessTokenForUser(userId)
+  if (!pat) {
+    throw new Error('GitHub not connected')
+  }
+
+  return await GitHubApiClient.getRepoInfo(pat, repoFullName)
+}
+
+async function getGitHubOrgsForUser(userId) {
+  const pat = await getGitHubAccessTokenForUser(userId)
+  if (!pat) {
+    throw new Error('GitHub not connected')
+  }
+
+  const orgs = await GitHubApiClient.listOrgs(pat)
+  const user = await GitHubApiClient.listUser(pat)
+  return { user: user, orgs: orgs }
+}
+
+async function exportProjectToGitHub(userId, projectId, name, description, isPrivate, org) {
+  const url = `${Settings.apis.github_sync.url}/project/${projectId}/user/${userId}/export`
+
+  logger.debug({ userId, projectId, url }, 'Exporting project to GitHub')
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, description, private: isPrivate, org }),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`GitHub Sync Service error: ${response.status} - ${errorText}`)
+  }
+
+  return await response.json()
+}
 
 export default {
   promises: {
     getUserGitHubStatus,
+    getProjectGitHubSyncStatus,
     listUserRepos,
     getProjectSyncStatus,
     exchangeCodeForToken,
     saveGitHubAccessTokenForUser,
     removeGitHubAccessTokenForUser,
     getGitHubAccessTokenForUser,
+    getRepoInfo,
+    saveNewlySyncedProjectState,
+    getGitHubOrgsForUser,
+    exportProjectToGitHub,
   },
 }

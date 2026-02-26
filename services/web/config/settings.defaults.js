@@ -303,6 +303,10 @@ module.exports = {
     // For legacy reasons, we need to populate the below objects.
     v1: {},
     recurly: {},
+
+    github_sync: {
+      url: `http://${process.env.GITHUB_SYNC_HOST || '127.0.0.1'}:${process.env.GITHUB_SYNC_PORT || 3022}`,
+    },
   },
 
   // Defines which features are allowed in the
@@ -1094,6 +1098,10 @@ module.exports = {
       Path.resolve(
         __dirname,
         '../modules/git-bridge/frontend/js/components/git-bridge-integration-card.tsx'
+      ),
+      Path.resolve(
+        __dirname,
+        '../modules/github-sync/frontend/js/components/github-integration-card.tsx'
       ),
     ],
     referenceSearchSetting: [],

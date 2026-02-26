@@ -8,7 +8,7 @@ https.globalAgent.keepAlive = false
 module.exports = {
   internal: {
     githubSync: {
-      host: process.env.GITHUB_SYNC_HOST || process.env.LISTEN_ADDRESS || '127.0.0.1',
+      host: process.env.LISTEN_ADDRESS || '127.0.0.1',
       port: 3022,
     },
   },

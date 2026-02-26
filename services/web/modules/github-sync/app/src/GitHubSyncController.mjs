@@ -8,7 +8,9 @@ import Path from 'path'
 import fs from 'fs'
 import crypto from 'crypto'
 import ProjectUploadManager from '../../../../app/src/Features/Uploads/ProjectUploadManager.mjs'
-import { Readable } from 'node:stream'
+import ProjectGetter from '../../../../app/src/Features/Project/ProjectGetter.mjs'
+import { fetchJson } from '@overleaf/fetch-utils'
+import UserGetter from '../../../../app/src/Features/User/UserGetter.mjs'
 
 
 /**
@@ -18,6 +20,10 @@ async function getStatus(req, res) {
   const userId = SessionManager.getLoggedInUserId(req.session)
 
   const status = await GitHubSyncHandler.promises.getUserGitHubStatus(userId)
+  if (!status) {
+    return res.json({ enabled: false })
+  }
+
   res.json(status)
 }
 
@@ -44,7 +50,18 @@ async function listRepos(req, res) {
 async function getProjectStatus(req, res) {
   const { Project_id: projectId } = req.params
 
-  const status = await GitHubSyncHandler.promises.getProjectSyncStatus(projectId)
+  const status = await GitHubSyncHandler.promises.getProjectGitHubSyncStatus(projectId)
+  
+  if (status && status.enabled) {
+    const ownerId = status.ownerId
+    const owner = await UserGetter.promises.getUser(ownerId, {
+      _id: 1,
+      email: 1,
+    })
+    if (owner) {
+      status.owner = owner
+    }
+  }
   res.json(status)
 }
 
@@ -59,7 +76,11 @@ async function importRepo(req, res) {
   const { projectName, repo } = req.body
 
   try {
-    const url = new URL(`https://api.github.com/repos/${repo}/zipball`)
+    // Get the latest sha1, branch name of a repo
+    const { defaultBranch, latestCommitSha } = await GitHubSyncHandler.promises.getRepoInfo(userId, repo)
+
+    // Then download the zipball from GitHub and create a new project with that zipball
+    const url = new URL(`https://api.github.com/repos/${repo}/zipball/${encodeURIComponent(latestCommitSha)}`)
     const token = await GitHubSyncHandler.promises.getGitHubAccessTokenForUser(userId)
     
     const response = await fetch(url.toString(), {
@@ -80,13 +101,33 @@ async function importRepo(req, res) {
     const ab = await response.arrayBuffer()
     fs.writeFileSync(fsPath, Buffer.from(ab))
 
-
+    // Upload zip to create a new project
     const { project } = await ProjectUploadManager.promises.createProjectFromZipArchiveWithName(
       userId,
       projectName,
       fsPath,
       {}
     )
+    const projectId = project._id.toString()
+
+    // Clean up temp file
+    fs.unlinkSync(fsPath)
+
+    // Re get projectID and version
+    // We need get from project history, because that's more accurate.
+    const snapshot = await fetchJson(
+      `${Settings.apis.project_history.url}/project/${projectId}/version`
+    )
+    const projectVersion = snapshot.version
+    await GitHubSyncHandler.promises.saveNewlySyncedProjectState(
+      project._id, 
+      userId, 
+      repo, 
+      latestCommitSha, 
+      defaultBranch, 
+      projectVersion
+    )
+
     res.json({ projectId: project._id})
   } catch (error) {
     logger.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Error importing GitHub repository')
@@ -159,8 +200,34 @@ async function unlink(req, res) {
   res.json({ success: true })
 }
 
+/**
+ * Export changes to Github.
+ */
 async function exportProject(req, res){
+  const userId = SessionManager.getLoggedInUserId(req.session)
+  const { Project_id: projectId } = req.params
+  const { name, description, private: isPrivate, org } = req.body
 
+  logger.debug({ userId, projectId, name, isPrivate, org }, 'Received request to export project to GitHub')
+  if (!name || isPrivate === undefined || !projectId) {
+    return res.status(400).json({ error: 'Name, private and projectId are required' })
+  }
+
+
+  try {
+    const repoResult = await GitHubSyncHandler.promises.exportProjectToGitHub(
+      userId,
+      projectId,
+      name,
+      description,
+      isPrivate,
+      org
+    )
+    res.json(repoResult)
+  } catch (error) {
+    logger.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Error exporting project to GitHub')
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' })
+  }
 }
 
 async function getUnmergedCommits(req, res){
@@ -171,10 +238,18 @@ async function mergeFromGitHub(req, res){
 
 }
 
+// List user and user's orgs.
+async function listOrgs(req, res) {
+  const userId = SessionManager.getLoggedInUserId(req.session)
+  const result = await GitHubSyncHandler.promises.getGitHubOrgsForUser(userId)
+  res.json(result)
+}
+
 export default {
   getStatus: expressify(getStatus),
   beginAuth: expressify(beginAuth),
   unlink: expressify(unlink),
+  listOrgs: expressify(listOrgs),
   completeRegistration: expressify(completeRegistration),
   listRepos: expressify(listRepos),
   getProjectStatus: expressify(getProjectStatus),
