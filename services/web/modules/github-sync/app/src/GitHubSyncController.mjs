@@ -23,7 +23,6 @@ async function getStatus(req, res) {
   if (!status) {
     return res.json({ enabled: false })
   }
-
   res.json(status)
 }
 
@@ -60,6 +59,16 @@ async function getProjectStatus(req, res) {
     })
     if (owner) {
       status.owner = owner
+    }
+
+    // check if owner's GitHub credentials are still valid. If not, return enabled: false to trigger re-auth flow in frontend
+    const credentials = await GitHubSyncHandler.promises.getGitHubAccessTokenForUser(ownerId)
+    if (!credentials) {
+      status.enabled = false
+      return res.json({
+        enabled: false
+      }
+      )
     }
 
     // remove status. last_sync_sha and .last_sync_version

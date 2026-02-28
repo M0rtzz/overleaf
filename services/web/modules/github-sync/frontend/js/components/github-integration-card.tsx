@@ -31,7 +31,44 @@ import { useEditorManagerContext } from '@/features/ide-react/context/editor-man
 import { Trans } from 'react-i18next'
 
 
-type GitHubSyncModalStatus = 'loading' | 'export' | 'merge' | 'pushSubmit' | 'syncing' | 'conflict'
+type GitHubSyncModalStatus = 'loading' | 'export' | 'merge' | 'pushSubmit' | 'syncing' | 'conflict' | 'need-auth'
+
+type GitHubSyncModalNeedAuthProps = {
+  handleHide: () => void
+}
+
+const GitHubSyncModalNeedAuth = ({ handleHide }: GitHubSyncModalNeedAuthProps) => {
+  const { t } = useTranslation()
+  const { appName } = getMeta('ol-ExposedSettings')
+  return (
+    <>
+      <OLModalBody>
+        <p>{t('link_to_github_description', { appName })}</p>
+      </OLModalBody>
+      <OLModalFooter>
+        <OLButton
+          variant="secondary"
+          onClick={handleHide}
+        >
+          {t('close')}
+        </OLButton>
+
+        <OLButton
+          variant="primary"
+          onClick={() => {
+            window.open(
+              '/github-sync/beginAuth',
+              'githubAuth',
+              'width=600,height=700'
+            )
+          }}
+        >
+          {t('link_to_github')}
+        </OLButton>
+      </OLModalFooter>
+    </>
+  )
+}
 
 type GitHubSyncModalSyncingProps = {
   handleHide: () => void
@@ -607,26 +644,52 @@ function GitHubSyncModal({
     if (!show || !project || modalStatus !== 'loading') {
       return
     }
-    const fetchGitHubSyncStatus = async () => {
+
+    const fetchUserGitHubSyncStatus = async () => {
       try {
-        const data = await getJSON(`/project/${projectId}/github-sync/status`)
-        if (data.enabled && data.merge_status === 'success') {
-          setModalStatus('merge')
-          setProjectSyncStatus(data)
-        } else if (data.enabled && data.merge_status === 'failure') {
-          setModalStatus('conflict')
-          setProjectSyncStatus(data)
-        }
-        else {
-          setModalStatus('export')
+        const data = await getJSON('/user/github-sync/status')
+        if (data.enabled) {
+          // fetch project github sync status
+          const projectStatus = await getJSON(`/project/${projectId}/github-sync/status`)
+          if (projectStatus.enabled && projectStatus.merge_status === 'success') {
+            setModalStatus('merge')
+            setProjectSyncStatus(projectStatus)
+          } else if (projectStatus.enabled && projectStatus.merge_status === 'failure') {
+            setModalStatus('conflict')
+            setProjectSyncStatus(projectStatus)
+          } else {
+            setModalStatus('export')
+          }
+        } else {
+          setModalStatus('need-auth')
         }
       } catch (err: any) {
         console.error('Failed to fetch GitHub sync status', err)
       }
     }
 
-    fetchGitHubSyncStatus()
+    // const fetchGitHubSyncStatus = async () => {
+    //   try {
+    //     const data = await getJSON(`/project/${projectId}/github-sync/status`)
+    //     if (data.enabled && data.merge_status === 'success') {
+    //       setModalStatus('merge')
+    //       setProjectSyncStatus(data)
+    //     } else if (data.enabled && data.merge_status === 'failure') {
+    //       setModalStatus('conflict')
+    //       setProjectSyncStatus(data)
+    //     }
+    //     else {
+    //       setModalStatus('export')
+    //     }
+    //   } catch (err: any) {
+    //     console.error('Failed to fetch GitHub sync status', err)
+    //   }
+    // }
+
+    fetchUserGitHubSyncStatus()
   }, [show, modalStatus])
+
+
 
   useEffect(() => {
     if (!show)
@@ -661,6 +724,9 @@ function GitHubSyncModal({
           handleHide={handleHide}
           setModalStatus={setModalStatus}
         />
+      }
+      {
+        modalStatus === 'need-auth' && <GitHubSyncModalNeedAuth handleHide={handleHide} />
       }
 
     </OLModal >

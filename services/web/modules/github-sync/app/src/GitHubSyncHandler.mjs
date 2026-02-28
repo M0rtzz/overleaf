@@ -15,6 +15,16 @@ async function getUserGitHubStatus(userId) {
   if (!credentials) {
     return { available: true, enabled: false }
   }
+
+  // test if the token is still valid by making an API call to GitHub
+  const token = await SecretsHelper.decryptAccessToken(credentials.auth_token_encrypted)
+  try {
+    await GitHubApiClient.listRepos(token, { per_page: 1 })
+  } catch (err) {
+    logger.warn({ userId, err }, 'GitHub token invalid, treating as not connected')
+    return { available: true, enabled: false }
+  }
+
   return {
     available: true,
     enabled: true
