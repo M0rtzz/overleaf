@@ -12,6 +12,11 @@ import { promises as fsPromises } from 'fs'
 import { Snapshot } from 'overleaf-editor-core'
 import { pipeline } from 'stream/promises'
 import { fetchStream } from '@overleaf/fetch-utils'
+import HttpsProxyAgent from 'https-proxy-agent'
+import fetch from 'node-fetch'
+
+const proxyUrl = process.env.GITHUB_SYNC_PROXY_URL
+const httpsAgent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined
 
 
 /**
@@ -206,7 +211,7 @@ async function downloadFile(url, fsPath, fileName, token) {
     'Accept': 'application/vnd.github.v3.raw'
   }
 
-  const response = await fetch(url, { headers: headers })
+  const response = await fetch(url, { headers: headers, agent: httpsAgent })
 
   if (!response.ok) {
     throw new Error(`Failed to download file from ${url}: ${response.statusText}`)
@@ -217,7 +222,7 @@ async function downloadFile(url, fsPath, fileName, token) {
   const writeStream = fs.createWriteStream(filePath)
 
   try {
-    const readStream = await fetchStream(url, { headers })
+    const readStream = await fetchStream(url, { headers, agent: httpsAgent })
     await pipeline(readStream, writeStream)
     return fsPath
   } catch (err) {

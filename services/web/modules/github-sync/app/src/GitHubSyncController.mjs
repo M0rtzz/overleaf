@@ -86,18 +86,7 @@ async function importRepo(req, res) {
     const { defaultBranch, latestCommitSha } = await GitHubSyncHandler.promises.getRepoInfo(userId, repo)
 
     // Then download the zipball from GitHub and create a new project with that zipball
-    const url = new URL(`https://api.github.com/repos/${repo}/zipball/${encodeURIComponent(latestCommitSha)}`)
-    const token = await GitHubSyncHandler.promises.getGitHubAccessTokenForUser(userId)
-    
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github.raw+json',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`)
-    }
+    const response = await GitHubSyncHandler.promises.getRepoZipball(userId, repo, latestCommitSha)
 
     const fsPath = Path.join(
       Settings.path.dumpFolder,

@@ -6,9 +6,6 @@ import Settings from '@overleaf/settings'
 import logger from '@overleaf/logger'
 import SecretsHelper from './SecretsHelper.mjs'
 import GitHubSyncUpdater from './GitHubSyncUpdater.mjs'
-import { fetchJson } from '@overleaf/fetch-utils'
-
-
 
 /**
  * Get user's GitHub sync status
@@ -98,8 +95,7 @@ async function getProjectSyncStatus(projectId) {
 // The implementation would involve making a POST request to GitHub's token endpoint
 // with the client ID, client secret, and the code received from the OAuth callback
 async function exchangeCodeForToken(code) {
-
-  return await GitHubApiClient.exchangeCodeForToken(code)
+  return await GitHubApiClient.exchangeCodeForPat(code)
 }
 
 // Save the GitHub access token for a user, encrypted in the database
@@ -263,6 +259,15 @@ async function applyChangesToOverleaf(projectId, newSha, files, userId) {
   
 }
 
+async function getRepoZipball(userId, repoFullName, latestCommitSha) {
+  const pat = await getGitHubAccessTokenForUser(userId)
+  if (!pat) {
+    throw new Error('GitHub not connected')
+  }
+
+  return await GitHubApiClient.getRepoZipball(pat, repoFullName, latestCommitSha)
+}
+
 export default {
   promises: {
     getUserGitHubStatus,
@@ -274,6 +279,7 @@ export default {
     removeGitHubAccessTokenForUser,
     getGitHubAccessTokenForUser,
     getRepoInfo,
+    getRepoZipball,
     saveNewlySyncedProjectState,
     getGitHubOrgsForUser,
     exportProjectToGitHub,

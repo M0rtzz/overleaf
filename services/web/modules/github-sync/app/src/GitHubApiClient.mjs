@@ -265,6 +265,25 @@ async function listCommitsSince(pat, fullName, branch, sinceCommitSha) {
   return commits
 }
 
+async function getRepoZipball(pat, repoFullName, latestCommitSha) {
+  const url = `${GITHUB_API_BASE}/repos/${repoFullName}/zipball/${latestCommitSha}`
+  const headers = {
+    Authorization: `token ${pat}`,
+    Accept: 'application/vnd.github.v3+json',
+  }
+
+  const response = await fetch(url, {
+    headers,
+    agent: httpsAgent,
+  })
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status} - ${response.statusText}`)
+  }
+
+  return response
+}
+
 export default {
   exchangeCodeForPat,
   verifyPat,
@@ -274,5 +293,6 @@ export default {
   listOrgs,
   listUser,
   getRepoInfo,
+  getRepoZipball,
   listCommitsSince,
 }

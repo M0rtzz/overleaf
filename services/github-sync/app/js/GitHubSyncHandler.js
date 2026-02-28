@@ -3,9 +3,13 @@ import { GitHubSyncProjectStates, GitHubSyncUserCredentials } from './modals/ind
 import { ObjectId } from './mongodb.js'
 import SecretHelper from './SecretHelper.js'
 import Settings from '@overleaf/settings'
-
+import HttpsProxyAgent from 'https-proxy-agent'
+import fetch from 'node-fetch'
 
 const GITHUB_API_BASE = 'https://api.github.com'
+const proxyUrl = process.env.GITHUB_SYNC_PROXY_URL
+const httpsAgent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined
+
 
 async function getProjectGitHubSyncStatus(projectId) {
   return GitHubSyncProjectStates.findByProjectId(projectId)
@@ -52,6 +56,7 @@ async function createRepositoryOnGitHub(userId, repoName, repoDescription, isPri
       'Authorization': `token ${accessToken}`,
       'Accept': 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
     body: JSON.stringify({
       name: repoName,
       description: repoDescription,
@@ -172,6 +177,7 @@ async function uploadBlobToGitHub(repoFullName, filePath, buffer, accessToken) {
       'Authorization': `token ${accessToken}`,
       'Accept': 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
     body: JSON.stringify({
       content,
       encoding,
@@ -207,6 +213,7 @@ async function createTreeOnGitHub(repoFullName, blobShas, accessToken, baseTreeS
       'Authorization': `token ${accessToken}`,
       'Accept': 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
     body: JSON.stringify(body),
   })
 
@@ -233,6 +240,7 @@ async function createCommitOnGitHub(repoFullName, treeSha, message, accessToken,
       tree: treeSha,
       parents: parents,
     }),
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -258,6 +266,7 @@ async function getBranchHeadCommitSha(repoFullName, branch, userId) {
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (response.status === 404) return null
@@ -287,6 +296,7 @@ async function updateBranchToCommit(
         sha: commitSha,
         force: ifForce,
       }),
+      agent: httpsAgent,
     }
   )
 
@@ -480,6 +490,7 @@ async function createOrUpdateBranchRef(repoFullName, branch, commitSha, userId) 
         ref: `refs/heads/${branch}`,
         sha: commitSha,
       }),
+      agent: httpsAgent,
     })
     if (!createResp.ok) {
       const errorData = await createResp.json().catch(() => ({}))
@@ -499,6 +510,7 @@ async function createOrUpdateBranchRef(repoFullName, branch, commitSha, userId) 
       sha: commitSha,
       force: false,
     }),
+    agent: httpsAgent,
   })
 
   if (!updateResp.ok) {
@@ -523,6 +535,7 @@ async function deleteBranchOnGitHub(repoFullName, branch, userId) {
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (response.status === 404) {
@@ -549,6 +562,7 @@ async function getCommitTreeSha(repoFullName, commitSha, accessToken) {
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -578,6 +592,7 @@ async function mergeBranchToDefaultBranch(repoFullName, sourceBranch, defaultBra
       head: sourceBranch,
       commit_message: `Merge ${sourceBranch} to ${defaultBranch}`,
     }),
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -626,6 +641,7 @@ async function diffChangesOnGitHub(repoFullName, baseBranch,
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -655,6 +671,7 @@ async function diffBranchsOnGitHub(
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -679,6 +696,7 @@ async function getFileTreeOnCommit(repoFullName, commitSha, userId) {
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (!response.ok) {
@@ -698,6 +716,7 @@ async function getFileTreeOnCommit(repoFullName, commitSha, userId) {
       Authorization: `token ${accessToken}`,
       Accept: 'application/vnd.github.v3+json',
     },
+    agent: httpsAgent,
   })
 
   if (!treeResponse.ok) {
