@@ -15,14 +15,15 @@ const ModalContent = () => {
   const { t } = useTranslation()
   const { appName } = getMeta('ol-ExposedSettings')
   const [isLoading, setIsLoading] = React.useState(true)
+  const [isLoadingImport, setIsLoadingImport] = React.useState(false)
   const [isEnabled, setIsEnabled] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [repos, setRepos] = React.useState<Array<{ name: string; fullName: string }>>([])
-  const [inFlight, setInFlight] = React.useState(false)
+
 
   const handleImport = (name: string, fullName: string) => {
-    setInFlight(true)
-
+    setIsLoading(true)
+    setIsLoadingImport(true)
     fetch('/project/new/github-sync', {
       method: 'POST',
       headers: {
@@ -45,7 +46,6 @@ const ModalContent = () => {
       .catch(error => {
         console.error('Error importing GitHub repository:', error)
         setError(error instanceof Error ? error.message : 'Unknown error')
-        setInFlight(false)
       })
   }
 
@@ -92,7 +92,9 @@ const ModalContent = () => {
         <div className="modal-body">
           <div role="status" className="loading align-items-center">
             <div aria-hidden="true" data-testid="ol-spinner" className="spinner-border spinner-border-sm"></div>
-            {t('loading_github_repositories')}
+            {
+              isLoadingImport ? t('importing') : t('loading_github_repositories')
+            }
           </div>
         </div>
       ) : isEnabled ? (
@@ -120,7 +122,6 @@ const ModalContent = () => {
                       <OLButton
                         variant="primary"
                         type="button"
-                        disabled={inFlight}
                         onClick={() => handleImport(repo.name, repo.fullName)}
                       >
                         {t('import_to_sharelatex', { appName })}
@@ -132,7 +133,7 @@ const ModalContent = () => {
             </table>
           </div>
         </>
-      ) : 
+      ) :
         <div className="modal-body">
           <p>{
             t('link_to_github_description', { appName })
@@ -144,7 +145,7 @@ const ModalContent = () => {
             {t('link_to_github')}
           </OLButton>
         </div>
-      
+
       }
     </>
   )
