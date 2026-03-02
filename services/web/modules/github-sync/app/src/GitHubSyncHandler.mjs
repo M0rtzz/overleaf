@@ -6,6 +6,7 @@ import Settings from '@overleaf/settings'
 import logger from '@overleaf/logger'
 import SecretsHelper from './SecretsHelper.mjs'
 import GitHubSyncUpdater from './GitHubSyncUpdater.mjs'
+import { fetchJson } from '@overleaf/fetch-utils'
 
 /**
  * Get user's GitHub sync status
