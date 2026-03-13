@@ -9,9 +9,9 @@ block content
 						.card-body
 							.page-header
 								if login_support_title
-									h1 !{login_support_title}
+									h1(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") !{login_support_title}
 								else
-									h1 #{translate("log_in")} 
+									h1(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") #{translate("log_in")}
 							form(name='loginForm' data-ol-async-form action='/login' method='POST')
 								input(name='_csrf' type='hidden' value=csrfToken)
 								+formMessagesNewStyle

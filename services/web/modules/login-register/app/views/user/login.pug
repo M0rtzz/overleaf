@@ -12,11 +12,11 @@ block content
 						.card-body
 							.page-header
 								if login_support_title
-									h1 !{login_support_title}
+									h1(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") !{login_support_title}
 								else
-									h1.h3 #{translate("log_in")}
-							.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
-							form(name='loginForm' data-ol-async-form action='/login' method='POST')
+									h1.h3(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") #{translate("log_in")}
+								.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
+							form(name='loginForm' data-ol-async-form action='/login' method='POST' style='margin-top: 0px !important;')
 								input(name='_csrf' type='hidden' value=csrfToken)
 								+formMessagesNewStyle
 								+customFormMessageNewStyle('invalid-password-retry-or-reset', 'danger')
@@ -31,7 +31,7 @@ block content
 										name='email'
 										type='email'
 										required
-										placeholder='email@example.com'
+										placeholder='email@example.edu.cn'
 										autofocus='true'
 										autocomplete='username'
 									)

@@ -36,7 +36,7 @@ describe('<SettingsPageRoot />', function () {
     render(<SettingsPageRoot />)
 
     await waitFor(() => {
-      screen.getByText('Account settings')
+      screen.getByText('Account Settings')
     })
     screen.getByText('Emails and affiliations')
     screen.getByText('Update account info')
@@ -57,7 +57,7 @@ describe('<SettingsPageRoot />', function () {
     render(<SettingsPageRoot />)
 
     await waitFor(() => {
-      screen.getByText('Account settings')
+      screen.getByText('Account Settings')
     })
     expect(screen.queryByText('Emails and affiliations')).to.not.exist
     screen.getByText('Update account info')

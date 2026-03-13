@@ -2,7 +2,7 @@ const settings = require('@overleaf/settings')
 const OutputCacheManager = require('./OutputCacheManager')
 
 const VALID_COMPILERS = ['pdflatex', 'latex', 'xelatex', 'lualatex']
-const MAX_TIMEOUT = 600
+const MAX_TIMEOUT = 1800
 const EDITOR_ID_REGEX = /^[a-f0-9-]{36}$/ // UUID
 
 function parse(body, callback) {

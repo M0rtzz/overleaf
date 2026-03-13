@@ -130,7 +130,7 @@ describe('new editor.git-bridge', function () {
         cy.findByRole('button', {
           name: 'Generate token',
         }).should('not.exist')
-        cy.findByText(/generate a new one in Account settings/)
+        cy.findByText(/generate a new one in Account Settings/)
         cy.findByRole('link', { name: 'Go to settings' })
           .should('have.attr', 'target', '_blank')
           .and('have.attr', 'href', '/user/settings')

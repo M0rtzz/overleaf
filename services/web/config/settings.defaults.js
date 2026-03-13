@@ -790,7 +790,12 @@ module.exports = {
 
     right_footer: [
       {
-        text: '<a href="https://github.com/overleaf/overleaf">Fork on GitHub!</a>',
+        text:
+          process.env.OVERLEAF_RIGHT_FOOTER_TEXT ||
+          "<i class='fa fa-github-square'></i> Get in Touch",
+        url:
+          process.env.OVERLEAF_RIGHT_FOOTER_URL ||
+          'https://github.com/M0rtzz/overleaf',
       },
     ],
 

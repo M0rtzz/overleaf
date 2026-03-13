@@ -6,13 +6,38 @@ import AuthenticationController from '../../../../app/src/Features/Authenticatio
 import RateLimiterMiddleware from "../../../../app/src/Features/Security/RateLimiterMiddleware.mjs"
 import { RateLimiter } from "../../../../app/src/infrastructure/RateLimiter.mjs"
 
-// Limit registration attempts to 3 per minute per IP
+// Limit registration attempts to 5 per 30 minutes per IP
 const registrationRateLimiters = {
   postRegister: new RateLimiter('postRegister', {
     points: 5,
-    duration: 60,
+    duration: 30 * 60,
   }),
 }
+
+function registrationRateLimitHandler(req, res) {
+  const rateLimitMessage =
+    'Too many registration attempts from this IP. Please try again after 30 minutes.'
+
+  logger.warn({ ip: req.ip }, 'registration rate limit exceeded')
+
+  if (req.accepts('json')) {
+    return res.status(429).json({
+      message: {
+        type: 'error',
+        text: rateLimitMessage,
+      },
+    })
+  }
+
+  res.status(429)
+  return res.render('user/register', {
+    err_message: rateLimitMessage,
+    csrfToken: req.csrfToken(),
+    showPasswordField: process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION === 'true',
+    showInviteCodeField: Boolean(process.env.OVERLEAF_PUBLIC_REGISTRATION_INVITE_CODE),
+  })
+}
+
 
 export default {
   apply(webRouter) {
@@ -40,14 +65,21 @@ export default {
       if (allowedRegistrationDomain != null && allowedRegistrationDomain == 'true') {
         webRouter.post(
           '/register',
-          RateLimiterMiddleware.rateLimit(registrationRateLimiters.postRegister),
+          RateLimiterMiddleware.rateLimit(registrationRateLimiters.postRegister, {
+            ipOnly: true,
+            onRateLimit: registrationRateLimitHandler,
+          }),
           RegisterController.registerWithUsernameAndPassword
         )
       }
       else if (allowedRegistrationDomain != null && allowedRegistrationDomain.startsWith('@')) {
         webRouter.post(
           '/register',
-          RateLimiterMiddleware.rateLimit(registrationRateLimiters.postRegister),
+          RateLimiterMiddleware.rateLimit(registrationRateLimiters.postRegister, {
+            ipOnly: true,
+            onRateLimit: registrationRateLimitHandler,
+          }),
+
           RegisterController.registerWithEmail
         )
       }
