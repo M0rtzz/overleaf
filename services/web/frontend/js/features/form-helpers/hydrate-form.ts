@@ -21,6 +21,7 @@ interface FormResponse {
   message?:
     | {
         text?: string
+        type?: 'success' | 'warning' | 'info'
       }
     | string
 }
@@ -80,7 +81,10 @@ function formSubmitHelper(formEl: HTMLFormElement) {
       // Show a success message (e.g. used on 2FA page)
       if (data.message) {
         messageBag.push({
-          type: 'message',
+          type:
+            typeof data.message === 'string'
+              ? 'success'
+              : data.message.type || 'success',
           text:
             typeof data.message === 'string'
               ? data.message

@@ -5,6 +5,57 @@ import AuthenticationManager from '../../../../app/src/Features/Authentication/A
 import EmailHelper from '../../../../app/src/Features/Helpers/EmailHelper.mjs'
 import HaveIBeenPwned from '../../../../app/src/Features/Authentication/HaveIBeenPwned.mjs'
 
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export function isAllowedRegistrationDomain(emailDomain, configuredDomainPattern) {
+  if (emailDomain == null || configuredDomainPattern == null) {
+    return false
+  }
+
+  const normalizedDomain = emailDomain.toLowerCase()
+  const pattern = configuredDomainPattern.slice(1).toLowerCase()
+
+  // Backward-compatible exact match when no wildcard is used.
+  if (!pattern.includes('*')) {
+    return normalizedDomain === pattern
+  }
+
+  // Wildcard support, e.g. @*.edu.cn -> mail.school.edu.cn, school.edu.cn.
+  const regexPattern = `^${pattern
+    .split('*')
+    .map(segment => escapeRegex(segment))
+    .join('.*')}$`
+
+  return new RegExp(regexPattern).test(normalizedDomain)
+}
+
+function isValidInviteCode(inviteCode) {
+  const requiredInviteCode = process.env.OVERLEAF_PUBLIC_REGISTRATION_INVITE_CODE
+  if (requiredInviteCode == null || requiredInviteCode === '') {
+    return true
+  }
+
+  return inviteCode != null && inviteCode === requiredInviteCode
+}
+
+function renderRegisterPage(req, res, { err_message } = {}) {
+  const showPasswordField = process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION === 'true'
+  const showInviteCodeField = Boolean(process.env.OVERLEAF_PUBLIC_REGISTRATION_INVITE_CODE)
+  const __dirname = Path.dirname(new URL(import.meta.url).pathname)
+
+  return res.status(err_message ? 429 : 200).render(
+    Path.resolve(__dirname, '../views/user/register'),
+    {
+      showPasswordField,
+      showInviteCodeField,
+      csrfToken: req.csrfToken(),
+      err_message,
+    }
+  )
+}
+
 export default {
   async registerPage(req, res, next) {
     // Check if the user is already logged in
@@ -12,26 +63,27 @@ export default {
       return res.redirect(`/`)
     }
 
-    const showPasswordField = process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION === 'true'
-
-    // If not logged in, render the registration page
-    const __dirname = Path.dirname(new URL(import.meta.url).pathname)
-    res.render(Path.resolve(__dirname, '../views/user/register'), {
-      showPasswordField,
-      csrfToken: req.csrfToken(),
-    })
+    return renderRegisterPage(req, res)
   },
 
   // Deal with user registration requests via email
   async registerWithEmail(req, res, next) {
-    const { email } = req.body
+    const { email, inviteCode } = req.body
     if (email == null || email === '') {
       return res.sendStatus(422) // Unprocessable Entity
+    }
+
+    if (!isValidInviteCode(inviteCode)) {
+      logger.warn({ email, ip: req.ip }, 'invalid registration invite code')
+      return res.status(400).json({
+        message: 'Invalid registration invite code',
+      })
     }
 
     // Validate email format before attempting to register the user
     const invalidEmail = AuthenticationManager.validateEmail(email)
     if (invalidEmail) {
+      logger.warn({ email, ip: req.ip }, 'invalid email during registration')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -43,7 +95,16 @@ export default {
     // If public registration is restricted to a specific email domain,
     // check that the email domain is allowed
     const domain = EmailHelper.getDomain(email)
-    if (domain == null || domain !== process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION.slice(1)) {
+    if (!isAllowedRegistrationDomain(domain, process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION)) {
+      logger.warn(
+        {
+          email,
+          domain,
+          allowedDomainPattern: process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION,
+          ip: req.ip,
+        },
+        'registration email domain not allowed'
+      )
       return res.status(400).json({
         message: 'Email domain not allowed for registration',
       })
@@ -53,6 +114,10 @@ export default {
       email,
       (error, user, setNewPasswordUrl) => {
         if (error != null) {
+          logger.error(
+            { err: error, email, ip: req.ip },
+            'error registering new user and sending activation email'
+          )
           return next(error)
         }
         return res.status(200).json({
@@ -64,14 +129,22 @@ export default {
 
   // Deal with user registration requests via username and password
   async registerWithUsernameAndPassword(req, res, next) {
-    const { email, password } = req.body
+    const { email, password, inviteCode } = req.body
     if (email == null || email === '' || password == null || password === '') {
       return res.sendStatus(422) // Unprocessable Entity
+    }
+
+    if (!isValidInviteCode(inviteCode)) {
+      logger.warn({ email, ip: req.ip }, 'invalid registration invite code')
+      return res.status(400).json({
+        message: 'Invalid registration invite code',
+      })
     }
 
     // Validate email and password format before attempting to register the user
     const invalidEmail = AuthenticationManager.validateEmail(email)
     if (invalidEmail) {
+      logger.warn({ email, ip: req.ip }, 'invalid email during registration')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -82,6 +155,7 @@ export default {
 
     const invalidPassword = AuthenticationManager.validatePassword(password, email)
     if (invalidPassword) {
+      logger.warn({ email, ip: req.ip }, 'invalid password during registration')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -95,10 +169,14 @@ export default {
     try {
       isPasswordReused = await HaveIBeenPwned.promises.checkPasswordForReuse(password)
     } catch (error) {
-      logger.error({ err: error }, 'Error checking password against HaveIBeenPwned')
+      logger.error(
+        { err: error, email, ip: req.ip },
+        'Error checking password against HaveIBeenPwned'
+      )
     }
 
     if (isPasswordReused) {
+      logger.warn({ email, ip: req.ip }, 'registration password found in data breach')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -117,7 +195,7 @@ export default {
       userDetails,
       (error, user) => {
         if (error != null) {
-          logger.debug({ err: error }, 'error registering user')
+          logger.error({ err: error, email, ip: req.ip }, 'error registering user')
           // Sets like "Email already in use" are communicated back to the client
           return res.status(400).json({
             message: error.message,

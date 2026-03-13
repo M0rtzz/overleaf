@@ -47,6 +47,8 @@ function rateLimit(rateLimiter, opts = {}) {
       .catch(err => {
         if (err instanceof Error) {
           next(err)
+        } else if (typeof opts.onRateLimit === 'function') {
+          opts.onRateLimit(req, res)
         } else {
           res.status(429) // Too many requests
           res.write('Rate limit reached, please try again later')
