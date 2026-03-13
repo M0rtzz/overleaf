@@ -39,7 +39,7 @@ app.use(Metrics.http.monitor(logger))
 // Compile requests can take longer than the default two
 // minutes (including file download time), so bump up the
 // timeout a bit.
-const TIMEOUT = 10 * 60 * 1000
+const TIMEOUT = 32 * 60 * 1000
 app.use(function (req, res, next) {
   req.setTimeout(TIMEOUT)
   res.setTimeout(TIMEOUT)

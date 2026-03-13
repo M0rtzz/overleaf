@@ -14,6 +14,47 @@ ENV REBUILT_AFTER="2026-01-13"
 
 # Install dependencies
 # --------------------
+RUN tee /etc/apt/sources.list.d/ubuntu.sources <<EOF
+Types: deb
+URIs: https://mirrors.hust.edu.cn/ubuntu
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# 默认注释了源码镜像以提高 apt update 速度
+# Types: deb-src
+# URIs: https://mirrors.hust.edu.cn/ubuntu
+# Suites: noble noble-updates noble-backports
+# Components: main restricted universe multiverse
+# Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# 安全更新源
+Types: deb
+URIs: https://mirrors.hust.edu.cn/ubuntu
+Suites: noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: https://mirrors.hust.edu.cn/ubuntu
+# Suites: noble-security
+# Components: main restricted universe multiverse
+# Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# 预发布源
+Types: deb
+URIs: https://mirrors.hust.edu.cn/ubuntu
+Suites: noble-proposed
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: https://mirrors.hust.edu.cn/ubuntu
+# Suites: noble-proposed
+# Components: main restricted universe multiverse
+# Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+EOF
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Technically, we are using potentially stale package-lists with the below line.
 # Practically, apt refreshes the lists as needed and release builds run in fresh CI VMs without the cache.
@@ -47,7 +88,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # # docker build \
 #     --build-arg TEXLIVE_MIRROR=https://ctan.crest.fr/tex-archive/systems/texlive/tlnet \
 #     -f Dockerfile-base -t sharelatex/sharelatex-base .
-ARG TEXLIVE_MIRROR=https://mirror.ox.ac.uk/sites/ctan.org/systems/texlive/tlnet
+#　ARG TEXLIVE_MIRROR=https://mirror.ox.ac.uk/sites/ctan.org/systems/texlive/tlnet
+ARG TEXLIVE_MIRROR=https://mirrors.hust.edu.cn/CTAN/systems/texlive/tlnet
 
 RUN mkdir /install-tl-unx \
 &&  wget --quiet https://tug.org/texlive/files/texlive.asc \

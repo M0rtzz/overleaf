@@ -27,7 +27,7 @@ function FooterItemLi({
 
   return (
     <li>
-      <a {...linkProps}>{textToDisplay}</a>
+      <a {...linkProps} dangerouslySetInnerHTML={{ __html: textToDisplay }} />
     </li>
   )
 }
@@ -60,7 +60,7 @@ function ThinFooter({
             {showPoweredBy ? (
               <>
                 <li>
-                  {/* year of Server Pro release, static */}© 2025{' '}
+                  {/* year of Server Pro release, static */}© 2026{' '}
                   <a href="https://www.overleaf.com/for/enterprises">
                     Powered by Overleaf
                   </a>

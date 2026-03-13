@@ -8,21 +8,38 @@ block content
 	main#main-content.content.content-alt
 		.container
 			.row
-				.col-lg-6.offset-lg-3.col-xl-4.offset-xl-4
-					.card
+				.col-lg-8.offset-lg-2.col-xl-6.offset-xl-3
+					.card(style='padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);')
 						.card-body
 							.page-header
-								h1.login-register-header-heading-focus.h3 #{translate("register")}
-							.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
+								h1.login-register-header-heading-focus.h3(style='font-family: Merriweather, serif; margin-bottom: 12.5px !important;') #{translate("register")}
+								.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
+							p(style='margin-top: 0px; font-family: Lato, sans-serif !important;')
+								| Registration requires a Chinese education email (*.edu.cn) and an invitation code.
+							p(style='font-family: Lato, sans-serif; margin-bottom: 15px !important;')
+								| Need help or a free code? Contact 
+								a(href='mailto:' + process.env.OVERLEAF_ADMIN_EMAIL style='color: #1e6b41;')= process.env.OVERLEAF_ADMIN_EMAIL
+								| .
 							form(
 								data-ol-async-form
-								name="registerForm"
-								action="/register",
-								method="POST",
+								name='registerForm'
+								action='/register'
+								method='POST'
 								aria-label=translate('create_account')
 							)
 								input(name='_csrf' type='hidden' value=csrfToken)
-								+formMessages()
+								.notification.notification-type-success.mb-3(role='status' aria-live='polite' data-ol-sent hidden)
+									.notification-icon
+										+material-symbol('check_circle')
+									.notification-content.text-left(style='font-family: Lato, sans-serif;')
+										p Your account activation email has been sent. Please check your inbox and follow the instructions to complete activation.
+										p If you don't see the email in your inbox, please check your spam folder first.
+										p If you still can't locate it or encounter other issues, contact me at !{`<a href="mailto:${process.env.OVERLEAF_ADMIN_EMAIL}" style="color: #1e6b41;">${process.env.OVERLEAF_ADMIN_EMAIL}</a>`}.
+										p(style='font-weight: bold; font-style: italic;') The password reset link will expire in one week, after which you'll need to register again.
+								div(data-ol-not-sent)
+									+formMessages()
+								if err_message
+									.alert.alert-danger(style='font-family: Lato, sans-serif; color: red; margin-top: 20px;')= err_message
 								+customFormMessageNewStyle('invalid-password-retry-or-reset', 'danger')
 									| !{translate('email_or_password_wrong_try_again_or_reset', {}, [{ name: 'a', attrs: { href: '/user/password/reset', 'aria-describedby': 'resetPasswordDescription' } }])}
 									span.visually-hidden(id='resetPasswordDescription')
@@ -30,67 +47,83 @@ block content
 								+customFormMessageNewStyle('password-compromised')
 									| !{translate('password_compromised_try_again_or_use_known_device_or_reset', {}, [{name: 'a', attrs: {href: 'https://haveibeenpwned.com/passwords', rel: 'noopener noreferrer', target: '_blank'}}, {name: 'a', attrs: {href: '/user/password/reset', target: '_blank'}}])}.
 								.form-group
-									label(for='emailField') #{translate("email")}
+									label(for='emailField' style='font-family: Lato, sans-serif; margin-bottom: 0.5em;') #{translate("email")}
 									input.form-control(
-										aria-label="email"
-										type='email',
-										name='email',
-										placeholder=translate("email"),
-										required,
-										autocomplete="username",
+										aria-label='email'
+										type='email'
+										name='email'
+										placeholder='email@example.edu.cn'
+										required
+										autocomplete='username'
 										autofocus
+										style='font-family: Lato, sans-serif !important; height: 45px !important; border-radius: 20px !important; padding: 10px 15px !important; border: 1px solid #ddd !important;'
 									)
 								if showPasswordField
 									.form-group
-										label(for='passwordField') #{translate("password")}
+										label(for='passwordField' style='font-family: Lato, sans-serif; margin-bottom: 0.5em;') #{translate("password")}
 										input.form-control(
-											aria-label="password"
-											type="password",
-											name="password",
-											placeholder=translate("password"),
-											required,
-											autocomplete="new-password"
+											aria-label='password'
+											type='password'
+											name='password'
+											placeholder=translate('password')
+											required
+											autocomplete='new-password'
+											style='font-family: Lato, sans-serif !important; height: 45px !important; border-radius: 20px !important; padding: 10px 15px !important; border: 1px solid #ddd !important;'
+										)
+								if showInviteCodeField
+									.form-group
+										label(for='inviteCodeField' style='font-family: Lato, sans-serif; margin-bottom: 0.5em;') Invitation Code
+										input.form-control(
+											aria-label='invite-code'
+											type='text'
+											name='inviteCode'
+											placeholder='Invitation Code'
+											required
+											autocomplete='off'
+											style='font-family: Lato, sans-serif !important; height: 45px !important; border-radius: 20px !important; padding: 10px 15px !important; border: 1px solid #ddd !important;'
 										)
 								.actions
 									button.btn.btn-primary.w-100(
-										type='submit',
+										type='submit'
 										data-ol-disabled-inflight
+										style='font-family: Lato, sans-serif; padding: 10px 25px; border-radius: 20px;'
 									)
-										span(data-ol-inflight="idle") #{translate("create_account")}
-										span(hidden data-ol-inflight="pending") #{translate("registering")}…
-							p.ciam-login-register-or-text-container
-								span.ciam-login-register-or-text #{translate("or")}
+										span(data-ol-inflight='idle') #{translate("create_account")}
+										span(hidden data-ol-inflight='pending') #{translate("registering")}…
+							if (settings.ldap && settings.ldap.enable) || (settings.saml && settings.saml.enable) || (settings.oidc && settings.oidc.enable)
+								p.ciam-login-register-or-text-container
+									span.ciam-login-register-or-text #{translate("or")}
 							if settings.ldap && settings.ldap.enable
 								.actions(style='margin-top: 15px;')
 									a.button.btn-secondary.btn(
-									href='/ldap/login',
-										style="width: 100%;"
+										href='/ldap/login'
+										style='width: 100%;'
 										data-ol-disabled-inflight
 									)
-										span(data-ol-inflight="idle") #{settings.ldap.identityServiceName}
-										span(hidden data-ol-inflight="pending") #{translate("logging_in")}…
+										span(data-ol-inflight='idle') #{settings.ldap.identityServiceName}
+										span(hidden data-ol-inflight='pending') #{translate("logging_in")}…
 							if settings.saml && settings.saml.enable
 								.actions(style='margin-top: 15px;')
 									a.button.btn-secondary.btn(
-									href='/saml/login',
-										style="width: 100%;"
+										href='/saml/login'
+										style='width: 100%;'
 										data-ol-disabled-inflight
 									)
-										span(data-ol-inflight="idle") #{settings.saml.identityServiceName}
-										span(hidden data-ol-inflight="pending") #{translate("logging_in")}…
+										span(data-ol-inflight='idle') #{settings.saml.identityServiceName}
+										span(hidden data-ol-inflight='pending') #{translate("logging_in")}…
 							if settings.oidc && settings.oidc.enable
 								.actions(style='margin-top: 15px;')
 									a.button.btn-secondary.btn(
-										href='/oidc/login',
-										style="width: 100%;"
+										href='/oidc/login'
+										style='width: 100%;'
 										data-ol-disabled-inflight
 									)
-										span(data-ol-inflight="idle") #{settings.oidc.identityServiceName}
-										span(hidden data-ol-inflight="pending") #{translate("logging_in")}…
-									
+										span(data-ol-inflight='idle') #{settings.oidc.identityServiceName}
+										span(hidden data-ol-inflight='pending') #{translate("logging_in")}…
+
 							.login-register-hr-text-container
 							.ciam-register-login-link
 								.login-register-other-links
-									.p 
+									.p
 										| #{translate("already_have_sl_account")} 
 										a(href='/login') #{translate("login")}
