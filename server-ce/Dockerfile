@@ -26,6 +26,7 @@ RUN --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/overleaf/services/web/node_modules/.cache,id=server-ce-webpack-cache \
     --mount=type=tmpfs,target=/tmp true \
+&&  export NODE_OPTIONS="--max-old-space-size=2048" \
 &&  node genScript install | bash \
 &&  node genScript compile | bash
 
