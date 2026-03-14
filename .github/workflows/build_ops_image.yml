@@ -94,7 +94,7 @@ jobs:
           tags: |
             sharelatex/sharelatex:latest
           annotations: |
-            space.ayaka.overleaf-pro.ops.revision=${{ steps.vars.outputs.MONOREPO_REVISION }}
+            org.opencontainers.image.revision=${{ steps.vars.outputs.MONOREPO_REVISION }}
           # We don't want -${{ github.ref_name }} limit, just more cache hit
           cache-from: type=gha,scope=ops
           cache-to: type=gha,mode=max,scope=ops

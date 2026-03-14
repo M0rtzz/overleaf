@@ -64,7 +64,7 @@ jobs:
         with:
           registry: ${{env.GHCR_REGISTRY}}
           username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          password: ${{secrets.ACCESS_TOKEN}}
       - name: Disable buildx default attestations
         run: |
           echo "BUILDX_NO_DEFAULT_ATTESTATIONS=1" >> $GITHUB_ENV
