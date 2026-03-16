@@ -6,7 +6,7 @@ on:
 
 
 jobs:
-  build-image:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Current Repository"
