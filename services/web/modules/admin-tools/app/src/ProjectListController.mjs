@@ -7,13 +7,31 @@ import Metrics from '@overleaf/metrics'
 import mongoose from 'mongoose'
 import ProjectHelper from '../../../../app/src/Features/Project/ProjectHelper.mjs'
 import { OError } from '../../../../app/src/Features/Errors/Errors.js'
+import SplitTestHandler from '../../../../app/src/Features/SplitTests/SplitTestHandler.mjs'
+import SessionManager from '../../../../app/src/Features/Authentication/SessionManager.mjs'
+import UserSettingsHelper from '../../../../app/src/Features/Project/UserSettingsHelper.mjs'
 import { Project } from '../../../../app/src/models/Project.mjs'
 import { DeletedProject } from '../../../../app/src/models/DeletedProject.mjs'
+import { User } from '../../../../app/src/models/User.mjs'
 import ProjectDeleter from '../../../../app/src/Features/Project/ProjectDeleter.mjs'
 
 const __dirname = Path.dirname(fileURLToPath(import.meta.url))
 
 async function manageProjectsPage(req, res, next) {
+  await SplitTestHandler.promises.getAssignment(
+    req,
+    res,
+    'themed-project-dashboard'
+  )
+  const userId = SessionManager.getLoggedInUserId(req.session)
+  const user = await User.findById(
+    userId,
+    'ace signUpDate alphaProgram betaProgram'
+  )
+  const userSettings = user
+    ? await UserSettingsHelper.buildUserSettings(req, res, user)
+    : undefined
+
   const projectsBlobPending = _getProjects().catch(err => {
     logger.err({ err }, 'projects listing in background failed')
     return undefined
@@ -28,6 +46,7 @@ async function manageProjectsPage(req, res, next) {
   res.render(Path.resolve(__dirname, '../views/manage-projects-react'), {
     title: 'Manage Projects',
     prefetchedProjectsBlob,
+    userSettings,
   })
 }
 

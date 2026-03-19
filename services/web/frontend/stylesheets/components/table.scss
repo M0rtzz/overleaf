@@ -28,7 +28,8 @@
   @include light-table;
 
   @include theme('default') {
-    .project-ds-nav-page {
+    .project-ds-nav-page,
+    .user-ds-nav-page {
       .table,
       .table-container {
         @include dark-table;

@@ -1145,7 +1145,8 @@ module.exports.mergeWith = function (overrides) {
 module.exports.splitTestOverrides = {
   'history-ranges-support': 'enabled',
   'revert-file': 'enabled',
-  'revert-project': 'enabled'
+  'revert-project': 'enabled',
+  'themed-project-dashboard': 'enabled'
 }
 
 module.exports.oauthProviders = {

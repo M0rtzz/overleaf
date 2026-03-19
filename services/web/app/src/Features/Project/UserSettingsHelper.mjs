@@ -53,7 +53,7 @@ async function buildUserSettings(req, res, user) {
     syntaxValidation: user.ace.syntaxValidation,
     fontFamily: user.ace.fontFamily || 'lucida',
     lineHeight: user.ace.lineHeight || 'normal',
-    overallTheme: user.ace.overallTheme,
+    overallTheme: user.ace?.overallTheme ?? 'system',
     mathPreview: user.ace.mathPreview,
     breadcrumbs: user.ace.breadcrumbs,
     referencesSearchMode: user.ace.referencesSearchMode,

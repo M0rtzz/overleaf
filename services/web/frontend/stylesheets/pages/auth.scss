@@ -54,12 +54,12 @@
 
 .login-register-header {
   padding-bottom: var(--spacing-07);
-  border-bottom: solid 1px var(--border-divider);
+  border-bottom: solid 1px var(--border-divider-themed);
 }
 
 .login-register-header-heading {
   margin: 0;
-  color: var(--content-secondary);
+  color: var(--content-primary-themed);
 }
 
 .login-register-hr-text-container {
@@ -72,7 +72,7 @@
     content: '';
     position: absolute;
     height: 1px;
-    background-color: var(--neutral-20);
+    background-color: var(--border-divider-themed);
     top: 50%;
     left: 0;
     right: 0;
@@ -81,7 +81,7 @@
 
 .login-register-hr-text {
   position: relative;
-  background-color: #fff;
+  background-color: var(--bg-primary-themed);
   padding: 0 var(--spacing-05);
 }
 
@@ -118,5 +118,61 @@
 
   .login-register-other-links {
     padding-top: var(--spacing-09);
+  }
+}
+
+.content-alt.auth-theme-page {
+  background-color: var(--bg-secondary-themed);
+  color: var(--content-primary-themed);
+
+  .registration-message,
+  .card-body,
+  .card-body p,
+  .card-body label,
+  .card-body h1 {
+    color: var(--content-primary-themed);
+  }
+
+  .card {
+    --bs-card-bg: var(--bg-primary-themed);
+    --bs-card-border-width: 1px;
+    --bs-card-border-color: var(--border-divider-themed);
+    color: var(--content-primary-themed);
+  }
+
+  .login-register-surface-card {
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-primary-themed);
+    border: 1px solid var(--border-divider-themed);
+    color: var(--content-primary-themed);
+  }
+
+  .page-header {
+    border-bottom-color: var(--border-divider-themed);
+  }
+
+  .login-register-page-header {
+    border-bottom: 0;
+  }
+
+  .form-control {
+    background-color: var(--bg-tertiary-themed);
+    border-color: var(--border-primary-themed);
+    color: var(--content-primary-themed);
+  }
+
+  .form-control::placeholder {
+    color: var(--content-placeholder-themed);
+  }
+
+  .register-success-notification,
+  .register-success-notification p {
+    color: var(--content-primary);
+  }
+
+  a:not(.btn) {
+    color: var(--link-web-themed);
   }
 }

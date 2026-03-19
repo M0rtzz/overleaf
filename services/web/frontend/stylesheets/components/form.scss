@@ -227,6 +227,41 @@
   }
 }
 
+@include theme('default') {
+  #project-list-root,
+  #manage-projects-root,
+  #manage-users-root,
+  #template-gallery-root,
+  #template-root,
+  .content-alt.admin-page {
+    .form-control,
+    .form-select {
+      background-color: var(--bg-tertiary-themed);
+      border-color: var(--border-primary-themed);
+      color: var(--content-primary-themed);
+
+      &:focus,
+      &:invalid:focus,
+      &.is-invalid:focus,
+      &:focus-visible,
+      &:invalid:focus-visible,
+      &.is-invalid:focus-visible {
+        background-color: var(--bg-tertiary-themed);
+        color: var(--content-primary-themed);
+      }
+    }
+
+    .form-control::placeholder {
+      color: var(--content-placeholder-themed);
+    }
+
+    .form-control-start-icon,
+    .form-control-end-icon {
+      color: var(--content-secondary-themed);
+    }
+  }
+}
+
 .website-redesign {
   label {
     color: $form-text-color;

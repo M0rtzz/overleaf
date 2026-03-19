@@ -4,6 +4,7 @@ include ../_mixins/material_symbol
 nav.navbar.navbar-default.navbar-main.navbar-expand-lg(
 	class={
 		'website-redesign-navbar': isWebsiteRedesign,
+		'light-theme-navbar': typeof forceLightMarketingNavbar !== 'undefined' && forceLightMarketingNavbar,
 	}
 	aria-label=translate('primary')
 )
