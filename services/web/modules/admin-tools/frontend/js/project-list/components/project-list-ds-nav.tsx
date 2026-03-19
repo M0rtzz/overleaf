@@ -15,7 +15,8 @@ import DefaultNavbar from '@/shared/components/navbar/default-navbar'
 import Footer from '@/shared/components/footer/footer'
 import SidebarDsNav from './sidebar/sidebar-ds-nav'
 import overleafLogo from '@/shared/svgs/overleaf-a-ds-solution-mallard.svg'
-import { getUserName } from '../util/user'
+import overleafLogoDark from '@/shared/svgs/overleaf-a-ds-solution-mallard-dark.svg'
+import { useActiveOverallTheme } from '@/shared/hooks/use-active-overall-theme'
 import { useProjectListContext } from '../context/project-list-context'
 import { useUserIdentityContext } from '../../user-list/context/user-identity-context'
 
@@ -34,6 +35,7 @@ export function ProjectListDsNav() {
     projectsOwnerId,
   } = useProjectListContext()
   const { getUserNameById } = useUserIdentityContext()
+  const activeOverallTheme = useActiveOverallTheme()
 
   const userName = projectsOwnerId ? getUserNameById(projectsOwnerId) : t('all_users')
   const tableTopArea = (
@@ -53,7 +55,9 @@ export function ProjectListDsNav() {
     <div className="project-ds-nav-page website-redesign">
       <DefaultNavbar
         {...navbarProps}
-        overleafLogo={overleafLogo}
+        overleafLogo={
+          activeOverallTheme === 'dark' ? overleafLogoDark : overleafLogo
+        }
         showCloseIcon
       />
       <div className="project-list-wrapper">

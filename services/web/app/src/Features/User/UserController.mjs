@@ -418,6 +418,15 @@ async function updateUserSettings(req, res, next) {
   }
   await user.save()
 
+  if (body.overallTheme != null) {
+    const overallThemeCookieValue =
+      body.overallTheme === '' ? 'dark' : body.overallTheme
+    res.cookie('ol-overallTheme', overallThemeCookieValue, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
+    })
+  }
+
   const newEmail = body.email?.trim().toLowerCase()
   if (
     newEmail == null ||
@@ -428,6 +437,10 @@ async function updateUserSettings(req, res, next) {
     SessionManager.setInSessionUser(req.session, {
       first_name: user.first_name,
       last_name: user.last_name,
+      ace: {
+        ...(SessionManager.getSessionUser(req.session)?.ace || {}),
+        overallTheme: user.ace?.overallTheme ?? 'system',
+      },
     })
     res.sendStatus(200)
   } else if (newEmail.indexOf('@') === -1) {
@@ -464,6 +477,10 @@ async function updateUserSettings(req, res, next) {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
+      ace: {
+        ...(SessionManager.getSessionUser(req.session)?.ace || {}),
+        overallTheme: user.ace?.overallTheme ?? 'system',
+      },
     })
 
     try {

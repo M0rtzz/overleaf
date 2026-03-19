@@ -18,7 +18,7 @@ const defaultSettings: UserSettings = {
   editorTheme: 'textmate',
   editorDarkTheme: 'overleaf_dark',
   editorLightTheme: 'textmate',
-  overallTheme: '',
+  overallTheme: 'system',
   mode: 'default',
   fontSize: 12,
   fontFamily: 'monaco',

@@ -2,7 +2,7 @@ import useSetOverallTheme from '@/features/editor-left-menu/hooks/use-set-overal
 import MaterialIcon from '@/shared/components/material-icon'
 import OLTooltip from '@/shared/components/ol/ol-tooltip'
 import { useUserSettingsContext } from '@/shared/context/user-settings-context'
-import getMeta from '@/utils/meta'
+import { getAvailableOverallThemes } from '@/shared/utils/overall-themes'
 import { OverallThemeMeta } from '@ol-types/project-settings'
 import { useTranslation } from 'react-i18next'
 
@@ -22,7 +22,7 @@ export default function ThemeToggle() {
     userSettings: { overallTheme },
   } = useUserSettingsContext()
   const setOverallTheme = useSetOverallTheme()
-  const overallThemes = getMeta('ol-overallThemes')
+  const overallThemes = getAvailableOverallThemes()
   const { t } = useTranslation()
 
   return (

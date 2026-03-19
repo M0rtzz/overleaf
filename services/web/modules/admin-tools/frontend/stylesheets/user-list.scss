@@ -61,7 +61,7 @@
   .user-list-title {
     @include heading-sm;
 
-    color: $content-secondary;
+    color: var(--content-secondary-themed);
     font-weight: bold;
     min-width: 0;
     font-size: var(--font-size-03);
@@ -242,7 +242,7 @@ ul.user-list-filters {
       font-weight: normal;
 
       &:hover {
-        color: var(--content-primary-dark);
+        color: var(--content-primary-themed);
         background-color: var(--bg-accent-01);
       }
 
@@ -278,7 +278,7 @@ ul.user-list-filters {
   .table-header-sort-btn {
     border: 0;
     text-align: left;
-    color: var(--content-secondary);
+    color: var(--content-secondary-themed);
     background-color: transparent;
     padding: 0;
     font-weight: bold;
@@ -289,7 +289,7 @@ ul.user-list-filters {
 
     &:hover,
     &:focus {
-      color: var(--content-secondary);
+      color: var(--content-secondary-themed);
       text-decoration: none;
     }
 

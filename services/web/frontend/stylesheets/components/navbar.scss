@@ -311,10 +311,17 @@
   @include navbar-light;
 }
 
+[data-theme='light'] .light-theme-navbar {
+  @include navbar-light;
+}
+
 @include theme('default') {
-  #project-list-root {
-    .website-redesign-navbar,
-    .website-redesign .navbar-default {
+  #project-list-root,
+  #manage-projects-root,
+  #manage-users-root,
+  #template-gallery-root,
+  #template-root {
+    .navbar-default {
       @include navbar-dark;
     }
   }

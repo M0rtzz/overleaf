@@ -88,9 +88,9 @@ export const UserSchema = new Schema(
     ace: {
       mode: { type: String, default: 'none' },
       theme: { type: String, default: 'textmate' },
-      overallTheme: { type: String, default: '' },
-      // When overallTheme is `system`, we switch between `lightTheme` and `darkTheme` based on system settings
-      // When overallTheme is `light-` or empty, we use the `theme` option.
+      overallTheme: { type: String, default: 'system' },
+      // When overallTheme is `system`, we switch between light/dark based on system settings.
+      // `light-` forces light and `''` forces dark (legacy dark value).
       lightTheme: { type: String, default: 'textmate' },
       darkTheme: { type: String, default: 'overleaf_dark' },
       fontSize: { type: Number, default: '12' },

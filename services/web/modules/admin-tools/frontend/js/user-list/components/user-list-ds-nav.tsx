@@ -18,7 +18,9 @@ import DefaultNavbar from '@/shared/components/navbar/default-navbar'
 import Footer from '@/shared/components/footer/footer'
 import SidebarDsNav from './sidebar/sidebar-ds-nav'
 import overleafLogo from '@/shared/svgs/overleaf-a-ds-solution-mallard.svg'
+import overleafLogoDark from '@/shared/svgs/overleaf-a-ds-solution-mallard-dark.svg'
 import CookieBanner from '@/shared/components/cookie-banner'
+import { useActiveOverallTheme } from '@/shared/hooks/use-active-overall-theme'
 import type { Filter } from '../context/user-list-context'
 import type { User } from '@modules/admin-tools/types/user/api'
 
@@ -118,6 +120,7 @@ export function UserListDsNav() {
   const navbarProps = getMeta('ol-navbar')
   const footerProps = getMeta('ol-footer')
   const activeUsersCount = getMeta('ol-activeUsersCount')
+  const activeOverallTheme = useActiveOverallTheme()
 
   const { t } = useTranslation()
   const {
@@ -148,7 +151,9 @@ export function UserListDsNav() {
     <div className="user-ds-nav-page website-redesign">
       <DefaultNavbar
         {...navbarProps}
-        overleafLogo={overleafLogo}
+        overleafLogo={
+          activeOverallTheme === 'dark' ? overleafLogoDark : overleafLogo
+        }
         showCloseIcon
       />
       <div className="user-list-wrapper">
@@ -159,9 +164,7 @@ export function UserListDsNav() {
 
               {error ? <DashApiError /> : ''}
               <main aria-labelledby="main-content">
-                <div className="card"
-                  style={{ backgroundColor: '#FFF' }}
-                >
+                <div className="card user-ds-nav-card">
                   <div className="card-body">
                     <div className="ol-tabs">
                       <div className="nav-tabs-container">

@@ -1,20 +1,21 @@
 extends ../../../../../app/views/layout-marketing
 
 block vars
-	- isWebsiteRedesign = true
+	- isWebsiteRedesign = false
+	- forceLightMarketingNavbar = true
 
 block content
-	main#main-content.content.content-alt
+	main#main-content.content.content-alt.auth-theme-page
 		.container
 			.row
-				.col-lg-6.offset-lg-3.col-xl-4.offset-xl-4
-					.card
+				.col-lg-8.offset-lg-2.col-xl-6.offset-xl-3
+					.card.login-register-surface-card
 						.card-body
-							.page-header
+							.page-header.login-register-page-header
 								if login_support_title
 									h1(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") !{login_support_title}
 								else
-									h1.h3(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") #{translate("log_in")}
+									h1(style="font-family: Merriweather, serif; margin-bottom: 12.5px !important;") #{translate("log_in")}
 								.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
 							form(name='loginForm' data-ol-async-form action='/login' method='POST' style='margin-top: 0px !important;')
 								input(name='_csrf' type='hidden' value=csrfToken)

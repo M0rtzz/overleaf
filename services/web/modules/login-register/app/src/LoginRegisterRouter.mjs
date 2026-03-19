@@ -6,11 +6,11 @@ import AuthenticationController from '../../../../app/src/Features/Authenticatio
 import RateLimiterMiddleware from "../../../../app/src/Features/Security/RateLimiterMiddleware.mjs"
 import { RateLimiter } from "../../../../app/src/infrastructure/RateLimiter.mjs"
 
-// Limit registration attempts to 5 per 30 minutes per IP
+// Limit registration attempts to 5 per 60 minutes per IP
 const registrationRateLimiters = {
   postRegister: new RateLimiter('postRegister', {
     points: 5,
-    duration: 30 * 60,
+    duration: 60 * 60,
   }),
 }
 
