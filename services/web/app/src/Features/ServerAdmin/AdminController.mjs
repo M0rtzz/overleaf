@@ -6,7 +6,9 @@ import TpdsUpdateSender from '../ThirdPartyDataStore/TpdsUpdateSender.mjs'
 import TpdsProjectFlusher from '../ThirdPartyDataStore/TpdsProjectFlusher.mjs'
 import EditorRealTimeController from '../Editor/EditorRealTimeController.mjs'
 import SystemMessageManager from '../SystemMessages/SystemMessageManager.mjs'
+import SessionManager from '../Authentication/SessionManager.mjs'
 import Modules from '../../infrastructure/Modules.mjs'
+import { User } from '../../models/User.mjs'
 
 const AdminController = {
   _sendDisconnectAllUsersMessage: delay => {
@@ -40,11 +42,25 @@ const AdminController = {
           'getPrivilegesMatrix'
         )
         const privilegesMatrix = privilegesMatrixResults[0] || null
+        const userId = SessionManager.getLoggedInUserId(req.session)
+        let overallThemeOverride = 'system'
+        if (userId != null) {
+          const user = await User.findById(userId, {
+            'ace.overallTheme': 1,
+          })
+            .lean()
+            .exec()
+          overallThemeOverride =
+            user && user.ace && typeof user.ace.overallTheme === 'string'
+              ? user.ace.overallTheme
+              : 'system'
+        }
         res.render('admin/index', {
           title: 'System Admin',
           openSockets,
           systemMessages,
           privilegesMatrix,
+          overallThemeOverride,
         })
       }
     )

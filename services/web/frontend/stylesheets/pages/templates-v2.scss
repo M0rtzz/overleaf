@@ -2,6 +2,32 @@
   padding-top: calc($header-height + var(--spacing-10)) !important;
 }
 
+.gallery.content-page {
+  background-color: var(--bg-secondary-themed);
+  color: var(--content-primary-themed);
+  --bs-body-color: var(--content-primary-themed);
+  --bs-heading-color: var(--content-primary-themed);
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--content-primary-themed);
+  }
+
+  .previous-page-link {
+    color: var(--content-primary-themed);
+
+    &:visited,
+    &:hover,
+    &:focus {
+      color: var(--content-primary-themed);
+    }
+  }
+}
+
 .gallery.gallery-tagged {
   .gallery-title {
     display: block;
@@ -121,7 +147,7 @@
   }
 
   .no-articles-matching {
-    color: var(--neutral-90);
+    color: var(--content-primary-themed);
     font-weight: 600;
 
     @include heading-lg;
@@ -159,6 +185,13 @@
 
       display: inline-block;
       width: 100%;
+      color: var(--content-primary-themed);
+
+      &:visited,
+      &:hover,
+      &:focus {
+        color: var(--content-primary-themed);
+      }
 
       .thumbnail,
       .thumbnail-tag {
@@ -226,7 +259,7 @@
     }
 
     .caption-description {
-      color: var(--neutral-70);
+      color: var(--content-secondary-themed);
       margin-bottom: 0;
 
       @include line-clamp;
@@ -234,7 +267,7 @@
 
     .author-name {
       margin-top: var(--spacing-04);
-      color: var(--neutral-70);
+      color: var(--content-secondary-themed);
       font-weight: 600;
     }
 
@@ -260,7 +293,7 @@
     }
 
     .caption-title {
-      color: var(--neutral-90);
+      color: var(--content-primary-themed);
       font-weight: 600;
 
       @include heading-md;

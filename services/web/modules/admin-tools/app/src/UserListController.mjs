@@ -24,6 +24,8 @@ import Errors, { OError } from '../../../../app/src/Features/Errors/Errors.js'
 import HaveIBeenPwned from '../../../../app/src/Features/Authentication/HaveIBeenPwned.mjs'
 import { db } from '../../../../app/src/infrastructure/mongodb.mjs'
 import AuthenticationManager from '../../../../app/src/Features/Authentication/AuthenticationManager.mjs'
+import SplitTestHandler from '../../../../app/src/Features/SplitTests/SplitTestHandler.mjs'
+import UserSettingsHelper from '../../../../app/src/Features/Project/UserSettingsHelper.mjs'
 
 const __dirname = Path.dirname(fileURLToPath(import.meta.url))
 
@@ -72,7 +74,20 @@ function cleanupSession(req) {
 async function manageUsersPage(req, res, next) {
   cleanupSession(req)
 
+  await SplitTestHandler.promises.getAssignment(
+    req,
+    res,
+    'themed-project-dashboard'
+  )
+
   const userId = SessionManager.getLoggedInUserId(req.session)
+  const user = await User.findById(
+    userId,
+    'ace signUpDate alphaProgram betaProgram'
+  )
+  const userSettings = user
+    ? await UserSettingsHelper.buildUserSettings(req, res, user)
+    : undefined
 
   const usersBlobPending = _getUsers().catch(err => {
     logger.err({ err }, 'users listing in background failed')
@@ -96,6 +111,7 @@ async function manageUsersPage(req, res, next) {
     userDetailsUpdatedOnLogin,
     userIsAdminUpdatedOnLogin,
     activeUsersCount,
+    userSettings,
   })
 }
 

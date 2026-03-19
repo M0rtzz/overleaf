@@ -92,6 +92,57 @@
   }
 }
 
+body.admin-panel-page {
+  background-color: var(--bg-secondary-themed);
+  color: var(--content-primary-themed);
+
+  .navbar-default {
+    @include navbar-dark;
+  }
+
+  &[data-theme='light'] .navbar-default {
+    @include navbar-light;
+  }
+}
+
+.content-alt.admin-page {
+  background-color: var(--bg-secondary-themed);
+  color: var(--content-primary-themed);
+
+  .card {
+    --bs-card-bg: var(--bg-primary-themed);
+    --bs-card-border-width: 1px;
+    --bs-card-border-color: var(--border-divider-themed);
+    color: var(--content-primary-themed);
+  }
+
+  .page-header {
+    border-bottom-color: var(--border-divider-themed);
+  }
+
+  .ol-tabs {
+    .nav-tabs-container .nav-tabs {
+      border-bottom-color: var(--border-divider-themed);
+
+      li {
+        a,
+        button {
+          color: var(--content-secondary-themed);
+
+          &:hover {
+            background-color: var(--bg-secondary-themed);
+          }
+        }
+      }
+
+      li > a.active,
+      li > button.active {
+        color: var(--content-primary-themed);
+      }
+    }
+  }
+}
+
 .admin-page summary {
   // firefox does not show markers for block items
   display: list-item;

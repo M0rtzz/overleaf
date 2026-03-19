@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { saveUserSettings } from '../utils/api'
 import { UserSettings } from '../../../../../types/user-settings'
 import { useUserSettingsContext } from '@/shared/context/user-settings-context'
-import getMeta from '@/utils/meta'
+import { getAvailableOverallThemes } from '@/shared/utils/overall-themes'
 
 export default function useSetOverallTheme() {
   const { userSettings, setUserSettings } = useUserSettingsContext()
@@ -20,7 +20,7 @@ export default function useSetOverallTheme() {
     (newOverallTheme: UserSettings['overallTheme']) => {
       if (overallTheme !== newOverallTheme) {
         const chosenTheme = _.find(
-          getMeta('ol-overallThemes'),
+          getAvailableOverallThemes(),
           theme => theme.val === newOverallTheme
         )
 

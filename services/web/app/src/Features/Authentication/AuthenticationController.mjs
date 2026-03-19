@@ -89,6 +89,9 @@ const AuthenticationController = {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
+      ace: {
+        overallTheme: user.ace?.overallTheme ?? 'system',
+      },
       referal_id: user.referal_id,
       session_created: new Date().toISOString(),
       ip_address: user._login_req_ip,

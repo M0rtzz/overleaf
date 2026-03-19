@@ -3,10 +3,28 @@ import Path from 'path'
 import ErrorController from '../../../../app/src/Features/Errors/ErrorController.mjs'
 import Errors from '../../../../app/src/Features/Errors/Errors.js'
 import SessionManager from '../../../../app/src/Features/Authentication/SessionManager.mjs'
+import { User } from '../../../../app/src/models/User.mjs'
 import TemplateGalleryManager from'./TemplateGalleryManager.mjs'
 import { getUserName } from './TemplateGalleryHelper.mjs'
 import { TemplateNameConflictError, RecompileRequiredError } from './TemplateErrors.mjs'
 import Settings from '@overleaf/settings'
+
+async function getOverallThemeOverride(req) {
+  const userId = SessionManager.getLoggedInUserId(req.session)
+  if (userId == null) {
+    return 'system'
+  }
+
+  const user = await User.findById(userId, {
+    'ace.overallTheme': 1,
+  })
+    .lean()
+    .exec()
+
+  return user && user.ace && typeof user.ace.overallTheme === 'string'
+    ? user.ace.overallTheme
+    : 'system'
+}
 
 async function createTemplateFromProject(req, res, next) {
   const t = req.i18n.translate
@@ -138,6 +156,7 @@ async function templatesCategoryPage(req, res, next) {
   try {
     let { category } = req.params
     const result = await TemplateGalleryManager.getTemplatesPageData(category)
+    const overallThemeOverride = await getOverallThemeOverride(req)
 
     let title
     if (result.categoryName) {
@@ -149,7 +168,8 @@ async function templatesCategoryPage(req, res, next) {
     res.render(Path.resolve(import.meta.dirname, '../views/template-gallery'), {
       title,
       category,
-       entrypoint: 'modules/template-gallery/pages/template'
+      entrypoint: 'modules/template-gallery/pages/template',
+      overallThemeOverride,
     })
   } catch (error) {
     next(error)
@@ -160,10 +180,12 @@ async function templateDetailsPage(req, res, next) {
   const t = req.i18n.translate
   try {
     const template = await TemplateGalleryManager.getTemplate('_id', req.params.template_id)
+    const overallThemeOverride = await getOverallThemeOverride(req)
     res.render(Path.resolve(import.meta.dirname, '../views/template'), {
       title: `${t('template')}: ${template.name}`,
       template: JSON.stringify(template),
       languages: Settings.languages,
+      overallThemeOverride,
     })
   } catch (error) {
     return ErrorController.notFound(req, res, next)

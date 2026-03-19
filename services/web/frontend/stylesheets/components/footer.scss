@@ -22,7 +22,8 @@ $footer-width-delta: 320px;
 
   @include theme('default') {
     .ide-redesign-main,
-    .project-ds-nav-page {
+    .project-ds-nav-page,
+    .user-ds-nav-page {
       .cookie-banner {
         @include cookie-banner-dark;
       }
@@ -83,14 +84,15 @@ $footer-width-delta: 320px;
 }
 
 footer.site-footer {
-  --link-color: var(--link-web);
-  --link-hover-color: var(--link-web-hover);
-  --link-visited-color: var(--link-web-visited);
+  --link-color: var(--link-web-themed);
+  --link-hover-color: var(--link-web-hover-themed);
+  --link-visited-color: var(--link-web-visited-themed);
   --link-text-decoration: none;
   --link-hover-text-decoration: underline;
 
-  background-color: var(--bg-light-primary);
-  border-top: 1px solid var(--border-primary-dark);
+  background-color: var(--bg-primary-themed);
+  border-top: 1px solid var(--border-divider-themed);
+  color: var(--content-secondary-themed);
 
   @include body-sm;
 
@@ -109,6 +111,10 @@ footer.site-footer {
     i {
       font-size: var(--font-size-05);
     }
+  }
+
+  .text-muted {
+    color: var(--content-disabled-themed) !important;
   }
 }
 
@@ -153,8 +159,10 @@ footer.site-footer {
 }
 
 .fat-footer {
-  --footer-text-color: var(--content-secondary-dark);
-  --footer-background-color: var(--bg-dark-primary);
+  --footer-text-color: var(--content-secondary-themed);
+  --footer-background-color: var(--bg-primary-themed);
+  --footer-base-text-color: var(--content-disabled-themed);
+  --footer-brand-image-url: url('../../../public/img/ol-brand/overleaf-white.svg');
   --link-color: var(--footer-text-color);
   --link-hover-color: var(--footer-text-color);
   --link-visited-color: var(--footer-text-color);
@@ -190,7 +198,7 @@ footer.site-footer {
     display: block;
     height: 37px;
     width: 130px;
-    background-image: url('../../../public/img/ol-brand/overleaf-white.svg');
+    background-image: var(--footer-brand-image-url);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: left center;
@@ -219,7 +227,7 @@ footer.site-footer {
   }
 
   .fat-footer-base {
-    color: var(--content-disabled);
+    color: var(--footer-base-text-color);
 
     @include body-sm;
 
@@ -391,6 +399,12 @@ footer.site-footer {
   }
 }
 
+@include theme('light') {
+  .fat-footer {
+    --footer-brand-image-url: url('../../../frontend/js/shared/svgs/overleaf-green.svg');
+  }
+}
+
 .cookie-banner {
   @include body-sm;
 
@@ -433,7 +447,8 @@ footer.site-footer {
 
 .website-redesign-fat-footer,
 .website-redesign .fat-footer {
-  --footer-text-color: var(--content-primary);
+  --footer-text-color: var(--content-primary-themed);
+  --footer-base-text-color: var(--content-secondary-themed);
 
   .fat-footer-container {
     @include footer-container-down(sm) {
@@ -442,17 +457,17 @@ footer.site-footer {
   }
 
   &.fat-footer {
-    background: var(--content-primary-dark);
+    background: var(--footer-background-color);
 
     h2 {
       font-weight: 400;
     }
 
     .fat-footer-base {
-      color: var(--content-primary);
+      color: var(--footer-base-text-color);
 
       #language-picker-toggle {
-        color: inherit;
+        color: var(--footer-text-color);
       }
     }
 
@@ -482,10 +497,6 @@ footer.site-footer {
         }
       }
     }
-  }
-
-  .footer-brand {
-    background-image: url('../../../frontend/js/shared/svgs/overleaf-green.svg');
   }
 
   @include footer-container-down(sm) {

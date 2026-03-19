@@ -1,8 +1,11 @@
 extends ../layout-marketing
 include ../_mixins/bookmarkable_tabset
 
+block vars
+	- isAdminPanelPage = true
+
 block content
-	#main-content.content.content-alt
+	#main-content.content.content-alt.admin-page
 		.container
 			.row
 				.col-sm-12
