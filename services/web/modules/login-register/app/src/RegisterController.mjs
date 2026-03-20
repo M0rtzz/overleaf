@@ -75,16 +75,16 @@ export default {
     }
 
     if (!isValidInviteCode(inviteCode)) {
-      logger.warn({ email, ip: req.ip }, 'invalid registration invite code')
+      logger.warn({ email, ip: req.ip }, 'Invalid registration invite code.')
       return res.status(400).json({
-        message: 'Invalid registration invite code',
+        message: 'Invalid registration invite code.',
       })
     }
 
     // Validate email format before attempting to register the user
     const invalidEmail = AuthenticationManager.validateEmail(email)
     if (invalidEmail) {
-      logger.warn({ email, ip: req.ip }, 'invalid email during registration')
+      logger.warn({ email, ip: req.ip }, 'Invalid email during registration.')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -104,10 +104,10 @@ export default {
           allowedDomainPattern: process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION,
           ip: req.ip,
         },
-        'registration email domain not allowed'
+        'Registration email domain not allowed.'
       )
       return res.status(400).json({
-        message: 'Email domain not allowed for registration',
+        message: 'Email domain not allowed for registration.',
       })
     }
 
@@ -117,7 +117,7 @@ export default {
         if (error != null) {
           logger.error(
             { err: error, email, ip: req.ip },
-            'error registering new user and sending activation email'
+            'Error registering new user and sending activation email.'
           )
           return next(error)
         }
@@ -136,16 +136,16 @@ export default {
     }
 
     if (!isValidInviteCode(inviteCode)) {
-      logger.warn({ email, ip: req.ip }, 'invalid registration invite code')
+      logger.warn({ email, ip: req.ip }, 'Invalid registration invite code.')
       return res.status(400).json({
-        message: 'Invalid registration invite code',
+        message: 'Invalid registration invite code.',
       })
     }
 
     // Validate email and password format before attempting to register the user
     const invalidEmail = AuthenticationManager.validateEmail(email)
     if (invalidEmail) {
-      logger.warn({ email, ip: req.ip }, 'invalid email during registration')
+      logger.warn({ email, ip: req.ip }, 'Invalid email during registration.')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -156,7 +156,7 @@ export default {
 
     const invalidPassword = AuthenticationManager.validatePassword(password, email)
     if (invalidPassword) {
-      logger.warn({ email, ip: req.ip }, 'invalid password during registration')
+      logger.warn({ email, ip: req.ip }, 'Invalid password during registration.')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -172,12 +172,12 @@ export default {
     } catch (error) {
       logger.error(
         { err: error, email, ip: req.ip },
-        'Error checking password against HaveIBeenPwned'
+        'Error checking password against HaveIBeenPwned.'
       )
     }
 
     if (isPasswordReused) {
-      logger.warn({ email, ip: req.ip }, 'registration password found in data breach')
+      logger.warn({ email, ip: req.ip }, 'Registration password found in data breach.')
       return res.status(400).json({
         message: {
           type: 'error',
@@ -196,7 +196,7 @@ export default {
       userDetails,
       (error, user) => {
         if (error != null) {
-          logger.error({ err: error, email, ip: req.ip }, 'error registering user')
+          logger.error({ err: error, email, ip: req.ip }, 'Error registering user.')
           // Sets like "Email already in use" are communicated back to the client
           return res.status(400).json({
             message: error.message,

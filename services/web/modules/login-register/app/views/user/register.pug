@@ -34,14 +34,14 @@ block content
 									.notification-content.text-left(style='font-family: Lato, sans-serif;')
 										p Your account activation email has been sent. Please check your inbox and follow the instructions to complete activation.
 										p If you don't see the email in your inbox, please check your spam folder first.
-										p If you still can't locate it or encounter other issues, contact me at !{`<a href="mailto:${process.env.OVERLEAF_ADMIN_EMAIL}" style="color: #1e6b41;">${process.env.OVERLEAF_ADMIN_EMAIL}</a>`}.
+										p If you still can't locate it or encounter other issues, contact me at !{`<a href="mailto:${process.env.OVERLEAF_ADMIN_EMAIL}" style="color: #098842;">${process.env.OVERLEAF_ADMIN_EMAIL}</a>`}.
 										p(style='font-weight: bold; font-style: italic;') The activation link will expire in one week, after which you'll need to register again.
 								div(data-ol-not-sent)
 									+formMessages()
 								if err_message
 									.alert.alert-danger(style='font-family: Lato, sans-serif; color: red; margin-top: 20px;')= err_message
 								+customFormMessageNewStyle('invalid-password-retry-or-reset', 'danger')
-									| !{translate('email_or_password_wrong_try_again_or_reset', {}, [{ name: 'a', attrs: { href: '/user/password/reset', 'aria-describedby': 'resetPasswordDescription' } }])}
+									| !{translate('email_or_password_wrong_try_again_or_reset', {}, [{ name: 'a', attrs: { href: '/user/password/reset', class: 'auth-theme-password-reset-link', 'aria-describedby': 'resetPasswordDescription' } }])}
 									span.visually-hidden(id='resetPasswordDescription')
 										| #{translate('reset_password_link')}
 								+customFormMessageNewStyle('password-compromised')

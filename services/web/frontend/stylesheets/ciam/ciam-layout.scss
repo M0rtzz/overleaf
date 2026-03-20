@@ -112,6 +112,17 @@
   @include media-breakpoint-up(sm) {
     padding: var(--ds-spacing-1300);
   }
+
+  .notification {
+    a:not(.btn),
+    a:not(.btn):visited,
+    a:not(.btn):hover,
+    a:not(.btn):focus,
+    a:not(.btn):active {
+      color: #098842;
+      text-decoration-color: currentColor;
+    }
+  }
 }
 
 .ciam-login-register-error-container .notification {
