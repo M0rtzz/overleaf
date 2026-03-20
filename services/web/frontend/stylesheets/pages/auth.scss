@@ -121,6 +121,20 @@
   }
 }
 
+form[name='loginForm'] {
+  .notification,
+  .alert {
+    a:not(.btn),
+    a:not(.btn):visited,
+    a:not(.btn):hover,
+    a:not(.btn):focus,
+    a:not(.btn):active {
+      color: #098842;
+      text-decoration-color: currentColor;
+    }
+  }
+}
+
 .content-alt.auth-theme-page {
   background-color: var(--bg-secondary-themed);
   color: var(--content-primary-themed);
@@ -174,7 +188,30 @@
     color: var(--content-primary);
   }
 
+  .notification .notification-content p,
+  .notification .notification-content p b {
+    color: var(--content-primary);
+  }
+
+  .notification,
+  .alert {
+    a:not(.btn),
+    a:not(.btn):visited,
+    a:not(.btn):hover,
+    a:not(.btn):focus,
+    a:not(.btn):active {
+      color: #098842;
+      text-decoration-color: currentColor;
+    }
+  }
+
   a:not(.btn) {
     color: var(--link-web-themed);
+  }
+
+  a.auth-theme-password-reset-link:not(.btn),
+  a.auth-theme-password-reset-link:not(.btn):hover,
+  a.auth-theme-password-reset-link:not(.btn):focus {
+    color: #098842;
   }
 }
