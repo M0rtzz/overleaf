@@ -47,6 +47,7 @@ async function manageProjectsPage(req, res, next) {
     title: 'Manage Projects',
     prefetchedProjectsBlob,
     userSettings,
+    ignoreOverallThemeCookie: true,
   })
 }
 

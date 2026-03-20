@@ -233,6 +233,7 @@ async function renderSetPasswordForm(req, res, next) {
       title: 'set_password',
       email,
       passwordResetToken,
+      overallThemeOverride: 'system',
     }
   )
 }
@@ -264,6 +265,7 @@ async function renderRequestResetForm(req, res) {
     {
       title: 'reset_password',
       error,
+      overallThemeOverride: 'system',
     }
   )
 }

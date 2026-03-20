@@ -13,6 +13,7 @@ html(
 	- var themeSessionUser = typeof getSessionUser === 'function' ? getSessionUser() : null
 	- var sessionOverallThemeSetting = themeSessionUser && themeSessionUser.ace && typeof themeSessionUser.ace.overallTheme === 'string' ? themeSessionUser.ace.overallTheme : 'system'
 	- var overallThemeSetting = typeof overallThemeOverride === 'string' ? overallThemeOverride : sessionOverallThemeSetting
+	- var ignoreThemeCookieForSystem = typeof ignoreOverallThemeCookie === 'boolean' ? ignoreOverallThemeCookie : false
 	- var initialBodyTheme = 'default'
 
 	block entrypointVar
@@ -115,30 +116,41 @@ html(
 		data-theme=initialBodyTheme
 	)
 		if overallThemeSetting === 'system'
-			script(nonce=scriptNonce).
-				(function () {
-					var cookieTheme = ''
-					var themeCookieMatch = document.cookie.match(/(?:^|;\s*)ol-overallTheme=([^;]+)/)
-					if (themeCookieMatch) {
-						cookieTheme = decodeURIComponent(themeCookieMatch[1] || '')
-					}
+			if ignoreThemeCookieForSystem
+				script(nonce=scriptNonce).
+					(function () {
+						if (!window.matchMedia) {
+							return
+						}
+						document.body.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+							? 'default'
+							: 'light'
+					})()
+			else
+				script(nonce=scriptNonce).
+					(function () {
+						var cookieTheme = ''
+						var themeCookieMatch = document.cookie.match(/(?:^|;\s*)ol-overallTheme=([^;]+)/)
+						if (themeCookieMatch) {
+							cookieTheme = decodeURIComponent(themeCookieMatch[1] || '')
+						}
 
-					if (cookieTheme === 'light-') {
-						document.body.dataset.theme = 'light'
-						return
-					}
-					if (cookieTheme === 'dark') {
-						document.body.dataset.theme = 'default'
-						return
-					}
+						if (cookieTheme === 'light-') {
+							document.body.dataset.theme = 'light'
+							return
+						}
+						if (cookieTheme === 'dark') {
+							document.body.dataset.theme = 'default'
+							return
+						}
 
-					if (!window.matchMedia) {
-						return
-					}
-					document.body.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-						? 'default'
-						: 'light'
-				})()
+						if (!window.matchMedia) {
+							return
+						}
+						document.body.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+							? 'default'
+							: 'light'
+					})()
 
 		if settings.recaptcha && settings.recaptcha.siteKeyV3
 			script(

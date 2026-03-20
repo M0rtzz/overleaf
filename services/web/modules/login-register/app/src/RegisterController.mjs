@@ -52,6 +52,7 @@ function renderRegisterPage(req, res, { err_message } = {}) {
       showInviteCodeField,
       csrfToken: req.csrfToken(),
       err_message,
+      overallThemeOverride: 'system',
     }
   )
 }
@@ -213,4 +214,3 @@ export default {
 
   }
 }
-

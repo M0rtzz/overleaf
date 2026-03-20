@@ -215,6 +215,7 @@ const UserPagesController = {
       sharedProjectData,
       newTemplateData,
       samlBeta: req.session.samlBeta,
+      overallThemeOverride: 'system',
     })
   },
 
@@ -236,6 +237,7 @@ const UserPagesController = {
       login_support_title: Settings.nav?.login_support_title,
       login_support_text: Settings.nav?.login_support_text,
       metadata,
+      overallThemeOverride: 'system',
     })
   },
 

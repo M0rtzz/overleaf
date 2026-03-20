@@ -168,7 +168,9 @@
   }
 
   .register-success-notification,
-  .register-success-notification p {
+  .register-success-notification p,
+  .auth-theme-success-notification,
+  .auth-theme-success-notification p {
     color: var(--content-primary);
   }
 
