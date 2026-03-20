@@ -79,6 +79,7 @@ function DeleteAuthenticationTokenModal({ show, handleHide, accessToken }: Delet
             animation
             onHide={handleHide}
             id="delete-authentication-token-modal"
+            className="create-authentication-token-modal"
             backdrop="static"
         >
             <ModalDeleteAuthenticationToken handleHide={handleHide} accessToken={accessToken} />

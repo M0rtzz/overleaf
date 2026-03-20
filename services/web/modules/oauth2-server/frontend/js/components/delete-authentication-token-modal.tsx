@@ -84,6 +84,7 @@ function DeleteAuthenticationTokenModal({ show, handleHide, tokenId }: DeleteAut
             show={show}
             onHide={handleHide}
             id="delete-authentication-token-modal"
+            className="delete-authentication-token-modal"
             backdrop='static'
         >
             <ModalDeleteAuthenticationToken
