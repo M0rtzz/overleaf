@@ -1340,7 +1340,7 @@
   "logged_in_with_email": "You are currently logged in to <b>__appName__</b> with the email <b>__email__</b>.",
   "logging_in": "Logging in",
   "logging_in_or_managing_your_account": "Logging in or managing your account",
-  "login": "Login",
+  "login": "Log in",
   "login_count": "Login count",
   "login_error": "Login error",
   "login_failed": "Login failed",
