@@ -1515,7 +1515,7 @@
   "no_new_commits_in_github": "No new commits in GitHub since last merge.",
   "no_one_has_commented_or_left_any_suggestions_yet": "No one has commented or left any suggestions yet.",
   "no_other_projects_found": "No other projects found, please create another project first",
-  "no_other_sessions": "No other sessions active",
+  "no_other_sessions": "No other sessions active.",
   "no_pdf_error_explanation": "This compile didn’t produce a PDF. This can happen if:",
   "no_pdf_error_reason_no_content": "The <code>document</code> environment contains no content. If it’s empty, please add some content and compile again.",
   "no_pdf_error_reason_output_pdf_already_exists": "This project contains a file called <code>output.pdf</code>. If that file exists, please rename it and compile again.",

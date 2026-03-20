@@ -1,0 +1,83 @@
+body.sessions-page {
+  &[data-theme='default'] {
+    .navbar-default {
+      @include navbar-dark;
+    }
+  }
+
+  &[data-theme='light'] {
+    .navbar-default {
+      @include navbar-light;
+    }
+  }
+
+  #main-content.content-alt.sessions-page {
+    background-color: var(--bg-secondary-themed);
+    color: var(--content-primary-themed);
+  }
+
+  .clear-user-sessions {
+    --bs-card-bg: var(--bg-primary-themed);
+    --bs-card-border-width: 1px;
+    --bs-card-border-color: var(--border-divider-themed);
+
+    color: var(--content-primary-themed);
+  }
+
+  .page-header,
+  .page-separator {
+    border-bottom-color: var(--border-divider-themed);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  th,
+  td {
+    color: var(--content-primary-themed);
+  }
+
+  p,
+  .small {
+    color: var(--content-secondary-themed);
+  }
+
+  a {
+    color: var(--link-web-themed);
+  }
+
+  .table {
+    --bs-table-color: var(--content-primary-themed);
+    --bs-table-bg: var(--bg-primary-themed);
+    --bs-table-striped-color: var(--content-secondary-themed);
+    --bs-table-striped-bg: var(--bg-secondary-themed);
+    --bs-table-hover-color: var(--content-primary-themed);
+    --bs-table-hover-bg: var(--bg-tertiary-themed);
+    --bs-border-divider: var(--border-divider-themed);
+  }
+
+  .table thead th {
+    color: var(--content-secondary-themed);
+  }
+
+  .btn-secondary {
+    color: var(--content-primary-themed);
+    background-color: var(--bg-primary-themed);
+    border-color: var(--border-primary-themed);
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--content-primary-themed);
+      background-color: var(--bg-tertiary-themed);
+      border-color: var(--border-primary-themed);
+    }
+  }
+
+  .text-success {
+    color: var(--content-positive-themed) !important;
+  }
+}
