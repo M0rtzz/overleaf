@@ -14,6 +14,8 @@ import NewsletterSection from './newsletter-section'
 import LeaveSection from './leave-section'
 import * as eventTracking from '../../../infrastructure/event-tracking'
 import { UserProvider } from '../../../shared/context/user-context'
+import { UserSettingsProvider } from '../../../shared/context/user-settings-context'
+import { SplitTestProvider } from '../../../shared/context/split-test-context'
 import { SSOProvider } from '../context/sso-context'
 import useWaitForI18n from '../../../shared/hooks/use-wait-for-i18n'
 import useScrollToIdOnLoad from '../../../shared/hooks/use-scroll-to-id-on-load'
@@ -23,6 +25,7 @@ import OLCol from '@/shared/components/ol/ol-col'
 import OLPageContentCard from '@/shared/components/ol/ol-page-content-card'
 import { isSplitTestEnabled } from '@/utils/splitTestUtils'
 import NotificationsSection from './notifications-section'
+import useThemedPage from '@/shared/hooks/use-themed-page'
 
 function SettingsPageRoot() {
   const { isReady } = useWaitForI18n()
@@ -30,6 +33,26 @@ function SettingsPageRoot() {
 
   useEffect(() => {
     eventTracking.sendMB('settings-view')
+  }, [])
+
+  return (
+    <SplitTestProvider>
+      <UserSettingsProvider>
+        <SettingsPageRootInner isReady={isReady} />
+      </UserSettingsProvider>
+    </SplitTestProvider>
+  )
+}
+
+function SettingsPageRootInner({ isReady }: { isReady: boolean }) {
+  useThemedPage()
+
+  useEffect(() => {
+    document.body.classList.add('account-settings-page')
+
+    return () => {
+      document.body.classList.remove('account-settings-page')
+    }
   }, [])
 
   return (

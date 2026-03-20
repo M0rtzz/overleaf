@@ -8,6 +8,7 @@ import getMeta from '@/utils/meta'
 describe('<SettingsPageRoot />', function () {
   let sendMBSpy: sinon.SinonSpy
   beforeEach(function () {
+    document.body.dataset.theme = 'default'
     window.metaAttributesCache.set('ol-usersEmail', 'foo@bar.com')
     Object.assign(getMeta('ol-ExposedSettings'), { isOverleaf: true })
     window.metaAttributesCache.set('ol-hasPassword', true)
@@ -25,11 +26,22 @@ describe('<SettingsPageRoot />', function () {
     window.metaAttributesCache.set('ol-github', { enabled: true })
     window.metaAttributesCache.set('ol-dropbox', { registered: true })
     window.metaAttributesCache.set('ol-oauthProviders', {})
+    window.metaAttributesCache.set('ol-userSettings', {
+      overallTheme: 'system',
+    })
+    this.originalMatchMedia = window.matchMedia
+    window.matchMedia = (() =>
+      ({
+        matches: true,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as MediaQueryList) as Window['matchMedia']
     sendMBSpy = sinon.spy(eventTracking, 'sendMB')
   })
 
   afterEach(function () {
     sendMBSpy.restore()
+    window.matchMedia = this.originalMatchMedia
   })
 
   it('displays page for Overleaf', async function () {
@@ -77,5 +89,38 @@ describe('<SettingsPageRoot />', function () {
 
     sinon.assert.calledOnce(sendMBSpy)
     sinon.assert.calledWith(sendMBSpy, 'settings-view')
+  })
+
+  it('uses the saved user theme', async function () {
+    window.metaAttributesCache.set('ol-userSettings', {
+      overallTheme: 'light-',
+    })
+
+    render(<SettingsPageRoot />)
+
+    await waitFor(() => {
+      expect(document.body.dataset.theme).to.equal('light')
+    })
+    expect(document.body.classList.contains('account-settings-page')).to.equal(
+      true
+    )
+  })
+
+  it('falls back to the system theme when the saved theme is invalid', async function () {
+    window.metaAttributesCache.set('ol-userSettings', {
+      overallTheme: 'invalid-theme',
+    })
+    window.matchMedia = (() =>
+      ({
+        matches: false,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as MediaQueryList) as Window['matchMedia']
+
+    render(<SettingsPageRoot />)
+
+    await waitFor(() => {
+      expect(document.body.dataset.theme).to.equal('light')
+    })
   })
 })
