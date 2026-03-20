@@ -56,6 +56,45 @@
   }
 }
 
+.create-authentication-token-modal {
+  .modal-header .modal-title {
+    color: var(--bs-modal-color) !important;
+  }
+
+  .modal-content,
+  .modal-header,
+  .modal-title,
+  .modal-body,
+  .modal-body p,
+  .modal-body strong,
+  .modal-body code,
+  .git-bridge-copy {
+    color: var(--bs-modal-color);
+  }
+
+  .modal-body a {
+    color: #098842;
+  }
+}
+
+.delete-authentication-token-modal {
+  .modal-content,
+  .modal-header,
+  .modal-title,
+  .modal-body,
+  .modal-body p,
+  .modal-body strong {
+    color: var(--bs-modal-color);
+  }
+}
+
+.modal-content .git-bridge-optional-tokens a,
+.modal-content .git-bridge-optional-tokens a:visited,
+.modal-content .git-bridge-optional-tokens a:hover,
+.modal-content .git-bridge-optional-tokens a:focus {
+  color: #098842 !important;
+}
+
 // Git bridge modal
 .git-bridge-copy {
   background: var(--bg-light-secondary);
