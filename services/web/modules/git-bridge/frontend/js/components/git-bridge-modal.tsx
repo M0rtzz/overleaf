@@ -100,7 +100,7 @@ type GitBridgeSyncModalProps = {
 function GitBridgeSyncModal({ show, projectId, handleHide }: GitBridgeSyncModalProps) {
     return (
         <OLModal show={show} animation onHide={handleHide}
-            id="git-bridge-sync-modal" backdrop="static" size="lg"
+            id="git-bridge-sync-modal" className="git-bridge-sync-modal" backdrop="static" size="lg"
         >
             <ModalGitBridgeSync projectId={projectId} handleHide={handleHide}
             />
