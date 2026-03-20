@@ -15,6 +15,7 @@ html(
 	- var overallThemeSetting = typeof overallThemeOverride === 'string' ? overallThemeOverride : sessionOverallThemeSetting
 	- var ignoreThemeCookieForSystem = typeof ignoreOverallThemeCookie === 'boolean' ? ignoreOverallThemeCookie : false
 	- var initialBodyTheme = 'default'
+	- var additionalBodyClasses = Array.isArray(bodyClasses) ? bodyClasses : typeof bodyClasses === 'string' ? [bodyClasses] : []
 
 	block entrypointVar
 
@@ -107,12 +108,15 @@ html(
 		block head-scripts
 
 	body(
-		class={
-			'thin-footer': showThinFooter,
-			'website-redesign': isWebsiteRedesign === true || websiteRedesignOverride,
-			'application-page': isApplicationPage,
-			'admin-panel-page': isAdminPanelPage,
-		}
+		class=[
+			additionalBodyClasses,
+			{
+				'thin-footer': showThinFooter,
+				'website-redesign': isWebsiteRedesign === true || websiteRedesignOverride,
+				'application-page': isApplicationPage,
+				'admin-panel-page': isAdminPanelPage,
+			},
+		]
 		data-theme=initialBodyTheme
 	)
 		if overallThemeSetting === 'system'

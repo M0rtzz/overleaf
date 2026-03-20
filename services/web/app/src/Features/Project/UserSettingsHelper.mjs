@@ -3,6 +3,11 @@ import SplitTestHandler from '../SplitTests/SplitTestHandler.mjs'
 // Copied from services/web/frontend/js/features/ide-redesign/utils/new-editor-utils.ts
 const SPLIT_TEST_USER_CUTOFF_DATE = new Date(Date.UTC(2025, 8, 23, 13, 0, 0)) // 2pm British Summer Time on September 23, 2025
 const NEW_USER_CUTOFF_DATE = new Date(Date.UTC(2025, 10, 12, 12, 0, 0)) // 12pm GMT on November 12, 2025
+const VALID_OVERALL_THEMES = new Set(['', 'light-', 'system'])
+
+function normalizeOverallTheme(overallTheme) {
+  return VALID_OVERALL_THEMES.has(overallTheme) ? overallTheme : 'system'
+}
 
 async function getEnableNewEditorLegacyDefault(req, res, user) {
   if (req.query['existing-user-override'] === 'true') {
@@ -53,7 +58,7 @@ async function buildUserSettings(req, res, user) {
     syntaxValidation: user.ace.syntaxValidation,
     fontFamily: user.ace.fontFamily || 'lucida',
     lineHeight: user.ace.lineHeight || 'normal',
-    overallTheme: user.ace?.overallTheme ?? 'system',
+    overallTheme: normalizeOverallTheme(user.ace?.overallTheme),
     mathPreview: user.ace.mathPreview,
     breadcrumbs: user.ace.breadcrumbs,
     referencesSearchMode: user.ace.referencesSearchMode,

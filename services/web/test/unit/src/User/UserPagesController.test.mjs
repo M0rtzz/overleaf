@@ -19,6 +19,23 @@ describe('UserPagesController', function () {
     }
     ctx.user = {
       _id: (ctx.user_id = 'kwjewkl'),
+      ace: {
+        mode: 'default',
+        theme: 'textmate',
+        lightTheme: 'textmate',
+        darkTheme: 'overleaf_dark',
+        fontSize: 12,
+        autoComplete: true,
+        autoPairDelimiters: true,
+        pdfViewer: 'pdfjs',
+        syntaxValidation: false,
+        fontFamily: 'lucida',
+        lineHeight: 'normal',
+        overallTheme: 'system',
+        mathPreview: true,
+        breadcrumbs: true,
+        referencesSearchMode: 'advanced',
+      },
       features: {},
       email: 'joe@example.com',
       ip_address: '1.1.1.1',
@@ -298,6 +315,42 @@ describe('UserPagesController', function () {
       })
     })
 
+    it('should use the current user theme and ignore the theme cookie', async function (ctx) {
+      ctx.user.ace.overallTheme = 'light-'
+
+      await new Promise((resolve, reject) => {
+        ctx.res.callback = () => {
+          ctx.res.renderedVariables.overallThemeOverride.should.equal('light-')
+          ctx.res.renderedVariables.ignoreOverallThemeCookie.should.equal(true)
+          expect(ctx.res.renderedVariables.bodyClasses).to.deep.equal([
+            'sessions-page',
+          ])
+          resolve()
+        }
+        ctx.UserPagesController.sessionsPage(
+          ctx.req,
+          ctx.res,
+          ctx.rejectOnError(reject)
+        )
+      })
+    })
+
+    it('should fall back to system when the saved theme is invalid', async function (ctx) {
+      ctx.user.ace.overallTheme = 'invalid-theme'
+
+      await new Promise((resolve, reject) => {
+        ctx.res.callback = () => {
+          ctx.res.renderedVariables.overallThemeOverride.should.equal('system')
+          resolve()
+        }
+        ctx.UserPagesController.sessionsPage(
+          ctx.req,
+          ctx.res,
+          ctx.rejectOnError(reject)
+        )
+      })
+    })
+
     it('should include current session data in the view', async function (ctx) {
       await new Promise((resolve, reject) => {
         ctx.res.callback = () => {
@@ -402,6 +455,11 @@ describe('UserPagesController', function () {
       await new Promise((resolve, reject) => {
         ctx.res.callback = () => {
           ctx.res.renderedTemplate.should.equal('user/settings')
+          ctx.res.renderedVariables.overallThemeOverride.should.equal('system')
+          ctx.res.renderedVariables.ignoreOverallThemeCookie.should.equal(true)
+          ctx.res.renderedVariables.userSettings.overallTheme.should.equal(
+            'system'
+          )
           resolve()
         }
         ctx.UserPagesController.settingsPage(

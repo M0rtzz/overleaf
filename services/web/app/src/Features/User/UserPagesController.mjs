@@ -12,6 +12,7 @@ import { expressify } from '@overleaf/promise-utils'
 import Features from '../../infrastructure/Features.mjs'
 import Modules from '../../infrastructure/Modules.mjs'
 import SplitTestHandler from '../SplitTests/SplitTestHandler.mjs'
+import UserSettingsHelper from '../Project/UserSettingsHelper.mjs'
 
 async function settingsPage(req, res) {
   const userId = SessionManager.getLoggedInUserId(req.session)
@@ -71,6 +72,8 @@ async function settingsPage(req, res) {
     )
   }
 
+  const userSettings = await UserSettingsHelper.buildUserSettings(req, res, user)
+
   let personalAccessTokens
   try {
     const results = await Modules.promises.hooks.fire(
@@ -121,6 +124,8 @@ async function settingsPage(req, res) {
 
   res.render('user/settings', {
     title: 'account_settings',
+    overallThemeOverride: userSettings.overallTheme,
+    ignoreOverallThemeCookie: true,
     user: {
       id: user._id,
       isAdmin: user.isAdmin,
@@ -179,6 +184,7 @@ async function settingsPage(req, res) {
     isSaas: Features.hasFeature('saas'),
     memberOfSSOEnabledGroups,
     capabilities: [...req.capabilitySet],
+    userSettings,
   })
 }
 
@@ -255,9 +261,15 @@ const UserPagesController = {
 
   settingsPage: expressify(settingsPage),
 
-  sessionsPage(req, res, next) {
+  async sessionsPage(req, res, next) {
     const user = SessionManager.getSessionUser(req.session)
     logger.debug({ userId: user._id }, 'loading sessions page')
+    let userSettings
+    try {
+      userSettings = await UserSettingsHelper.buildUserSettings(req, res, user)
+    } catch (err) {
+      return next(err)
+    }
     const currentSession = {
       ip_address: user.ip_address,
       session_created: user.session_created,
@@ -274,6 +286,9 @@ const UserPagesController = {
         }
         res.render('user/sessions', {
           title: 'sessions',
+          overallThemeOverride: userSettings.overallTheme,
+          ignoreOverallThemeCookie: true,
+          bodyClasses: ['sessions-page'],
           currentSession,
           sessions,
         })

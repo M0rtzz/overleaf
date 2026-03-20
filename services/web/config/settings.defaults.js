@@ -795,7 +795,7 @@ module.exports = {
           "<i class='fa fa-github-square'></i> Get in Touch",
         url:
           process.env.OVERLEAF_RIGHT_FOOTER_URL ||
-          'https://github.com/M0rtzz/overleaf',
+          'https://github.com/M0rtzz',
       },
     ],
 
