@@ -62,6 +62,9 @@ export function ProjectListDsNav() {
       <SystemMessages />
       <DefaultNavbar
         {...navbarProps}
+        navbarClassName={
+          activeOverallTheme === 'light' ? 'light-theme-navbar' : undefined
+        }
         overleafLogo={
           activeOverallTheme === 'dark' ? overleafLogoDark : overleafLogo
         }

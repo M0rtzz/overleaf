@@ -67,34 +67,92 @@ describe('<ProjectListRoot />', function () {
     window.metaAttributesCache.set('ol-navbar', {
       items: [],
     })
+    window.metaAttributesCache.delete('ol-userSettings')
     this.locationWrapperSandbox = sinon.createSandbox()
     this.locationWrapperStub = this.locationWrapperSandbox.stub(location)
+    this.originalMatchMedia = window.matchMedia
   })
 
   afterEach(function () {
     sendMBSpy.restore()
     fetchMock.removeRoutes().clearHistory()
     this.locationWrapperSandbox.restore()
+    window.matchMedia = this.originalMatchMedia
   })
 
   describe('welcome page', function () {
-    beforeEach(async function () {
+    async function renderWelcomePage() {
       renderWithProjectListContext(<ProjectListRoot />, {
         projects: [],
       })
       await fetchMock.callHistory.flush(true)
-    })
+    }
 
     it('the welcome page is displayed', async function () {
+      await renderWelcomePage()
       await screen.findByRole('heading', { name: 'Welcome to Overleaf' })
     })
 
     it('the email confirmation alert is not displayed', async function () {
+      await renderWelcomePage()
       expect(
         screen.queryByText(
           'Please confirm your primary email address test@overleaf.com by clicking on the link in the confirmation email.'
         )
       ).to.be.null
+    })
+
+    it('uses the system theme when no saved theme exists', async function () {
+      window.matchMedia = (() =>
+        ({
+          matches: false,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as MediaQueryList) as Window['matchMedia']
+
+      await renderWelcomePage()
+      await screen.findByRole('heading', { name: 'Welcome to Overleaf' })
+
+      await waitFor(() => {
+        expect(document.body.dataset.theme).to.equal('light')
+      })
+    })
+
+    it('uses a saved theme when one exists', async function () {
+      window.metaAttributesCache.set('ol-userSettings', {
+        overallTheme: 'light-',
+      })
+
+      await renderWelcomePage()
+      await screen.findByRole('heading', { name: 'Welcome to Overleaf' })
+
+      await waitFor(() => {
+        expect(document.body.dataset.theme).to.equal('light')
+      })
+      expect(
+        document
+          .querySelector('.navbar-default')
+          ?.classList.contains('light-theme-navbar')
+      ).to.equal(true)
+    })
+
+    it('falls back to the system theme when the saved theme is invalid', async function () {
+      window.metaAttributesCache.set('ol-userSettings', {
+        overallTheme: 'invalid-theme',
+      })
+      window.matchMedia = (() =>
+        ({
+          matches: false,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as MediaQueryList) as Window['matchMedia']
+
+      await renderWelcomePage()
+      await screen.findByRole('heading', { name: 'Welcome to Overleaf' })
+
+      await waitFor(() => {
+        expect(document.body.dataset.theme).to.equal('light')
+      })
     })
   })
 

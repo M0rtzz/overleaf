@@ -1,75 +1,83 @@
-extends ../../../../app/views/layout-website-redesign
+extends ../../../../app/views/layout-marketing
 
 block vars
-	- isWebsiteRedesign = true
+	- isWebsiteRedesign = false
+	- forceLightMarketingNavbar = true
 
 include ../../../../app/views/_mixins/material_symbol
 
 block content
-	main#main-content.content.content-alt
+	main#main-content.content.content-alt.auth-theme-page
 		.container
-			.col-lg-6.col-xl-4.m-auto
-				.notification-list
-					.notification.notification-type-success(aria-live='off' role='alert')
-						.notification-content-and-cta
-							.notification-icon
-								+material-symbol('check_circle')
-							.notification-content
-								p
-									| #{translate("nearly_activated")}
+			.row
+				.col-lg-8.offset-lg-2.col-xl-6.offset-xl-3
+					.card.login-register-surface-card
+						.card-body
+							.notification.notification-type-success.auth-theme-success-notification.mb-3(aria-live='off' role='alert')
+								.notification-content-and-cta
+									.notification-icon
+										+material-symbol('check_circle')
+									.notification-content.text-left(style='font-family: Lato, sans-serif;')
+										p #{translate("nearly_activated")}
 
-				h1.h3 #{translate("please_set_a_password")}
+							.page-header.login-register-page-header
+								h1.login-register-header-heading-focus(style='font-family: Merriweather, serif; margin-bottom: 12.5px !important;') #{translate("please_set_a_password")}
+								.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
 
-				form(
-					name='activationForm'
-					data-ol-async-form
-					action='/user/password/set'
-					method='POST'
-				)
-					+formMessages
+							form(
+								name='activationForm'
+								data-ol-async-form
+								action='/user/password/set'
+								method='POST'
+								style='margin-top: 0px !important;'
+							)
+								+formMessagesNewStyle
 
-					+customFormMessage('token-expired', 'danger')
-						| #{translate("activation_token_expired")}
+								+customFormMessageNewStyle('token-expired', 'danger')
+									| #{translate("activation_token_expired")}
 
-					+customFormMessage('invalid-password', 'danger')
-						| #{translate('invalid_password')}
+								+customFormMessageNewStyle('invalid-password', 'danger')
+									| #{translate('invalid_password')}
 
-					+customFormMessage('password-must-be-different', 'danger')
-						| #{translate('password_change_password_must_be_different')}
+								+customFormMessageNewStyle('password-must-be-different', 'danger')
+									| #{translate('use_a_different_password')}.
 
-					input(name='_csrf' type='hidden' value=csrfToken)
-					input(name='passwordResetToken' type='hidden' value=token)
+								input(name='_csrf' type='hidden' value=csrfToken)
+								input(name='passwordResetToken' type='hidden' value=token)
 
-					.form-group
-						label(for='emailField') #{translate("email")}
-						input#emailField.form-control(
-							name='email'
-							aria-label='email'
-							type='email'
-							placeholder='email@example.com'
-							autocomplete='username'
-							value=email
-							required
-							disabled
-						)
-					.form-group
-						label(for='passwordField') #{translate("password")}
-						input#passwordField.form-control(
-							name='password'
-							type='password'
-							placeholder='********'
-							autocomplete='new-password'
-							autofocus
-							required
-							minlength=settings.passwordStrengthOptions.length.min
-						)
-					.actions
-						button.btn.btn-primary(
-							type='submit'
-							data-ol-disabled-inflight
-							aria-label=translate('activate')
-						)
-							span(data-ol-inflight='idle')
-								| #{translate('activate')}
-							span(hidden data-ol-inflight='pending')
-								| #{translate('activating')}…
+								.form-group
+									label(for='emailField' style='font-family: Lato, sans-serif; margin-bottom: 0.5em;') #{translate("email")}
+									input#emailField.form-control(
+										name='email'
+										aria-label='email'
+										type='email'
+										placeholder='email@example.edu.cn'
+										autocomplete='username'
+										value=email
+										required
+										disabled
+										style='font-family: Lato, sans-serif !important; height: 45px !important; border-radius: 20px !important; padding: 10px 15px !important; border: 1px solid var(--border-primary-themed) !important; background-color: var(--bg-disabled-themed) !important; color: var(--content-disabled-themed) !important;'
+									)
+								.form-group
+									label(for='passwordField' style='font-family: Lato, sans-serif; margin-bottom: 0.5em;') #{translate("password")}
+									input#passwordField.form-control(
+										name='password'
+										type='password'
+										placeholder='********'
+										autocomplete='new-password'
+										autofocus
+										required
+										minlength=settings.passwordStrengthOptions.length.min
+										style='font-family: Lato, sans-serif !important; height: 45px !important; border-radius: 20px !important; padding: 10px 15px !important; border: 1px solid var(--border-primary-themed) !important; background-color: var(--bg-tertiary-themed) !important; color: var(--content-primary-themed) !important;'
+									)
+								.actions
+									button.btn.btn-primary(
+										type='submit'
+										data-ol-disabled-inflight
+										aria-label=translate('activate')
+										style='font-family: Lato, sans-serif; padding: 10px 25px; border-radius: 20px;'
+									)
+										span(data-ol-inflight='idle')
+											| #{translate('activate')}
+										span(hidden data-ol-inflight='pending')
+											| #{translate('activating')}…

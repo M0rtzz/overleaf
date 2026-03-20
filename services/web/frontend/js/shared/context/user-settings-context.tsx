@@ -31,6 +31,24 @@ const defaultSettings: UserSettings = {
   darkModePdf: false,
 }
 
+const validOverallThemes = new Set(['', 'light-', 'system'])
+
+function normalizeUserSettings(
+  settings?: Partial<UserSettings> | null
+): UserSettings {
+  const mergedSettings = {
+    ...defaultSettings,
+    ...settings,
+  }
+
+  return {
+    ...mergedSettings,
+    overallTheme: validOverallThemes.has(mergedSettings.overallTheme)
+      ? mergedSettings.overallTheme
+      : 'system',
+  }
+}
+
 type UserSettingsContextValue = {
   userSettings: UserSettings
   setUserSettings: Dispatch<
@@ -46,7 +64,7 @@ export const UserSettingsProvider: FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [userSettings, setUserSettings] = useState<UserSettings>(
-    () => getMeta('ol-userSettings') || defaultSettings
+    () => normalizeUserSettings(getMeta('ol-userSettings'))
   )
 
   const value = useMemo<UserSettingsContextValue>(

@@ -170,6 +170,7 @@ async function templatesCategoryPage(req, res, next) {
       category,
       entrypoint: 'modules/template-gallery/pages/template',
       overallThemeOverride,
+      ignoreOverallThemeCookie: true,
     })
   } catch (error) {
     next(error)
@@ -186,6 +187,7 @@ async function templateDetailsPage(req, res, next) {
       template: JSON.stringify(template),
       languages: Settings.languages,
       overallThemeOverride,
+      ignoreOverallThemeCookie: true,
     })
   } catch (error) {
     return ErrorController.notFound(req, res, next)

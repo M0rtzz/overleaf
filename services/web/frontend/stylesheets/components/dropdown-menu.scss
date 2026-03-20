@@ -38,6 +38,7 @@
 
 @include theme('default') {
   .ide-redesign-main,
+  #project-list-root,
   .project-ds-nav-page,
   .user-ds-nav-page {
     @include dark-dropdown-menu;

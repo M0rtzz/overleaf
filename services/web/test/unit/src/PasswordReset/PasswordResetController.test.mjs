@@ -529,6 +529,7 @@ describe('PasswordResetController', function () {
           await new Promise(resolve => {
             ctx.res.render = (templatePath, options) => {
               options.passwordResetToken.should.equal(ctx.token)
+              options.overallThemeOverride.should.equal('system')
               resolve()
             }
             ctx.PasswordResetController.renderSetPasswordForm(ctx.req, ctx.res)
@@ -558,6 +559,19 @@ describe('PasswordResetController', function () {
             ctx.PasswordResetController.renderSetPasswordForm(ctx.req, ctx.res)
           })
         })
+      })
+    })
+  })
+
+  describe('renderRequestResetForm', function () {
+    it('should render the reset request page with system theme fallback', async function (ctx) {
+      await new Promise(resolve => {
+        ctx.res.render = (templatePath, options) => {
+          templatePath.should.equal('user/passwordReset')
+          options.overallThemeOverride.should.equal('system')
+          resolve()
+        }
+        ctx.PasswordResetController.renderRequestResetForm(ctx.req, ctx.res)
       })
     })
   })
