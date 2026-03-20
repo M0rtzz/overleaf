@@ -35,6 +35,7 @@ function registrationRateLimitHandler(req, res) {
     csrfToken: req.csrfToken(),
     showPasswordField: process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION === 'true',
     showInviteCodeField: Boolean(process.env.OVERLEAF_PUBLIC_REGISTRATION_INVITE_CODE),
+    overallThemeOverride: 'system',
   })
 }
 

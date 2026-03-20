@@ -112,6 +112,7 @@ async function manageUsersPage(req, res, next) {
     userIsAdminUpdatedOnLogin,
     activeUsersCount,
     userSettings,
+    ignoreOverallThemeCookie: true,
   })
 }
 
@@ -201,10 +202,15 @@ async function activateAccountPage(req, res, next) {
 
   const user = await UserGetter.promises.getUser(req.query.user_id, {
     email: 1,
+    loginCount: 1,
   })
 
   if (!user) {
     return ErrorController.notFound(req, res)
+  }
+
+  if (user.loginCount > 0) {
+    return res.redirect('/login')
   }
 
   req.session.doLoginAfterPasswordReset = true
@@ -213,6 +219,9 @@ async function activateAccountPage(req, res, next) {
     title: 'activate_account',
     email: user.email,
     token: req.query.token,
+    // Activation pages should follow the current device theme cookie if it
+    // exists; otherwise layout-base falls back to the system theme.
+    overallThemeOverride: 'system',
   })
 }
 

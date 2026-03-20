@@ -595,6 +595,7 @@ async function projectListPage(req, res, next) {
     role,
     usedLatex,
     inactiveTutorials,
+    ignoreOverallThemeCookie: true,
   })
 }
 

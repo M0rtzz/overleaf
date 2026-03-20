@@ -15,6 +15,9 @@ describe('UserActivateController', function () {
       _id: (ctx.user_id = 'kwjewkl'),
       features: {},
       email: 'joe@example.com',
+      ace: {
+        overallTheme: 'system',
+      },
     }
 
     ctx.UserGetter = {
@@ -127,6 +130,33 @@ describe('UserActivateController', function () {
           page.should.equal(VIEW_PATH)
           opts.email.should.equal(ctx.user.email)
           opts.token.should.equal(ctx.token)
+          opts.overallThemeOverride.should.equal('system')
+          resolve()
+        }
+        ctx.UserActivateController.activateAccountPage(ctx.req, ctx.res)
+      })
+    })
+
+    it('always defers activation page theme selection to the current device', async function (ctx) {
+      await new Promise(resolve => {
+        ctx.user.loginCount = 0
+        ctx.user.ace.overallTheme = 'light-'
+        ctx.res.render = (page, opts) => {
+          page.should.equal(VIEW_PATH)
+          opts.overallThemeOverride.should.equal('system')
+          resolve()
+        }
+        ctx.UserActivateController.activateAccountPage(ctx.req, ctx.res)
+      })
+    })
+
+    it('falls back to system when the saved overall theme is invalid', async function (ctx) {
+      await new Promise(resolve => {
+        ctx.user.loginCount = 0
+        ctx.user.ace.overallTheme = 'invalid-theme'
+        ctx.res.render = (page, opts) => {
+          page.should.equal(VIEW_PATH)
+          opts.overallThemeOverride.should.equal('system')
           resolve()
         }
         ctx.UserActivateController.activateAccountPage(ctx.req, ctx.res)

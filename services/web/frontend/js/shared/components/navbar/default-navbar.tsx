@@ -18,10 +18,14 @@ import overleafBlackLogo from '@/shared/svgs/overleaf-black.svg'
 import type { CSSPropertiesWithVariables } from '../../../../../types/css-properties-with-variables'
 
 function DefaultNavbar(
-  props: DefaultNavbarMetadata & { overleafLogo?: string }
+  props: DefaultNavbarMetadata & {
+    overleafLogo?: string
+    navbarClassName?: string
+  }
 ) {
   const {
     overleafLogo,
+    navbarClassName,
     customLogo,
     title,
     canDisplayAdminMenu,
@@ -53,7 +57,9 @@ function DefaultNavbar(
   return (
     <>
       <Navbar
-        className="navbar-default navbar-main"
+        className={['navbar-default navbar-main', navbarClassName]
+          .filter(Boolean)
+          .join(' ')}
         expand="lg"
         onToggle={expanded => setExpanded(expanded)}
         style={

@@ -21,6 +21,7 @@ import { DsNavStyleProvider } from '@/features/project-list/components/use-is-ds
 import CookieBanner from '@/shared/components/cookie-banner'
 import useThemedPage from '@/shared/hooks/use-themed-page'
 import { UserSettingsProvider } from '@/shared/context/user-settings-context'
+import { useActiveOverallTheme } from '@/shared/hooks/use-active-overall-theme'
 
 function ProjectListRoot() {
   const { isReady } = useWaitForI18n()
@@ -49,10 +50,16 @@ export function ProjectListRootInner() {
 function DefaultNavbarAndFooter({ children }: { children: ReactNode }) {
   const navbarProps = getMeta('ol-navbar')
   const footerProps = getMeta('ol-footer')
+  const activeOverallTheme = useActiveOverallTheme('themed-project-dashboard')
 
   return (
     <>
-      <DefaultNavbar {...navbarProps} />
+      <DefaultNavbar
+        {...navbarProps}
+        navbarClassName={
+          activeOverallTheme === 'light' ? 'light-theme-navbar' : undefined
+        }
+      />
       <main
         className="content content-alt project-list-react"
         aria-labelledby="main-content"

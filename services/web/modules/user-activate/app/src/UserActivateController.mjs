@@ -59,6 +59,9 @@ async function activateAccountPage(req, res, next) {
     title: 'activate_account',
     email: user.email,
     token: req.query.token,
+    // Activation pages should follow the current device theme cookie if it
+    // exists; otherwise layout-base falls back to the system theme.
+    overallThemeOverride: 'system',
   })
 }
 

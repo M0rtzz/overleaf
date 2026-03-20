@@ -61,6 +61,7 @@ const AdminController = {
           systemMessages,
           privilegesMatrix,
           overallThemeOverride,
+          ignoreOverallThemeCookie: true,
         })
       }
     )
