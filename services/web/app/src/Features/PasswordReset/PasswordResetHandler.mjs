@@ -71,6 +71,7 @@ async function getUserForPasswordResetToken(token) {
     _id: 1,
     'overleaf.id': 1,
     email: 1,
+    hashedPassword: 1,
     must_reconfirm: 1,
   })
 

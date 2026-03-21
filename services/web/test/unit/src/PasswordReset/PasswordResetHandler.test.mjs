@@ -612,5 +612,21 @@ describe('PasswordResetHandler', function () {
         remainingPeeks: 1,
       })
     })
+
+    it('loads hashedPassword so external auth policies can distinguish local accounts', async function (ctx) {
+      await ctx.PasswordResetHandler.promises.getUserForPasswordResetToken(
+        'abc123'
+      )
+
+      expect(
+        ctx.UserGetter.promises.getUserByMainEmail.calledWith(ctx.email, {
+          _id: 1,
+          'overleaf.id': 1,
+          email: 1,
+          hashedPassword: 1,
+          must_reconfirm: 1,
+        })
+      ).to.equal(true)
+    })
   })
 })
