@@ -34,6 +34,11 @@
 
 :root {
   @include light-dropdown-menu;
+  --dropdown-account-email-color: #d0d5dd;
+}
+
+@include theme('light') {
+  --dropdown-account-email-color: #2f3a4c;
 }
 
 @include theme('default') {
@@ -158,6 +163,15 @@ $dropdown-item-min-height: 36px;
       color: inherit;
     }
   }
+}
+
+.dropdown-account-email,
+.dropdown-account-email.disabled,
+.dropdown-account-email[aria-disabled='true'],
+.dropdown-account-email.dropdown-item,
+.dropdown-account-email.dropdown-item:visited {
+  color: var(--dropdown-account-email-color) !important;
+  opacity: 1;
 }
 
 .dropdown-divider {

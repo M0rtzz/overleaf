@@ -45,31 +45,31 @@ block content
 		src=(wsUrl || '/socket.io') + '/socket.io.js'
 	)
 
-	#main-content.content.content-alt
+	main#main-content.content.content-alt.auth-theme-page.launchpad-page
 		.container
 			.row
-				.col-lg-8.offset-lg-2
-					.card
-						.card-body
+				.col-lg-8.offset-lg-2.col-xl-6.offset-xl-3
+					.card.login-register-surface-card.launchpad-card
+						.card-body.launchpad-card-body
 							.row
 								.col-lg-12
-									.text-center
-										h1 #{translate('welcome_to_sl')}
-										p
+									.text-center.launchpad-hero
+										h1.launchpad-title #{translate('welcome_to_sl')}
+										p.launchpad-logo
 											img(src=buildImgPath('/ol-brand/overleaf-o.svg'))
 
 							<!-- wrapper -->
 							.row
-								.col-lg-8.offset-lg-2
+								.col-lg-12
 									<!-- create first admin form -->
 									if !adminUserExists
-										.row(data-ol-not-sent)
+										.row.launchpad-section(data-ol-not-sent)
 											.col-lg-12
-												h2 #{translate('create_first_admin_account')}
+												h2.launchpad-section-title #{translate('create_first_admin_account')}
 
 												// Local Auth Form
 												if authMethod === 'local'
-													form(
+													form.launchpad-form(
 														data-ol-async-form
 														data-ol-register-admin
 														action='/launchpad/register_admin'
@@ -79,7 +79,7 @@ block content
 														+formMessages
 														.form-group
 															label.form-label(for='email') #{translate("email")}
-															input.form-control(
+															input.form-control.launchpad-input(
 																name='email'
 																type='email'
 																id='email'
@@ -89,7 +89,7 @@ block content
 															)
 														.form-group
 															label.form-label(for='passwordField') #{translate("password")}
-															input#passwordField.form-control(
+															input#passwordField.form-control.launchpad-input(
 																name='password'
 																type='password'
 																autocomplete='new-password'
@@ -102,11 +102,11 @@ block content
 
 												// Ldap Form
 												if authMethod === 'ldap'
-													h3 #{translate('ldap')}
-													p
+													h3.launchpad-subsection-title #{translate('ldap')}
+													p.launchpad-help-text
 														| #{translate('ldap_create_admin_instructions')}
 
-													form(
+													form.launchpad-form(
 														data-ol-async-form
 														data-ol-register-admin
 														action='/launchpad/register_ldap_admin'
@@ -116,7 +116,7 @@ block content
 														+formMessages
 														.form-group
 															label.form-label(for='email') #{translate("email")}
-															input.form-control(
+															input.form-control.launchpad-input(
 																name='email'
 																id='email'
 																type='email'
@@ -131,11 +131,11 @@ block content
 
 												// Saml Form
 												if authMethod === 'saml'
-													h3 #{translate('saml')}
-													p
+													h3.launchpad-subsection-title #{translate('saml')}
+													p.launchpad-help-text
 														| #{translate('saml_create_admin_instructions')}
 
-													form(
+													form.launchpad-form(
 														data-ol-async-form
 														data-ol-register-admin
 														action='/launchpad/register_saml_admin'
@@ -145,7 +145,7 @@ block content
 														+formMessages
 														.form-group
 															label.form-label(for='email') #{translate("email")}
-															input.form-control(
+															input.form-control.launchpad-input(
 																name='email'
 																type='email'
 																id='email'
@@ -158,38 +158,35 @@ block content
 																span(data-ol-inflight='idle') #{translate("register")}
 																span(hidden data-ol-inflight='pending') #{translate("registering")}…
 
-										br
-
 									<!-- status indicators -->
 									if adminUserExists
-										.row
+										.row.launchpad-section
 											.col-lg-12.status-indicators
-												h2 #{translate('status_checks')}
+												h2.launchpad-section-title #{translate('status_checks')}
 
 												<!-- websocket -->
-												.row.row-spaced-small
-													.col-sm-5
-														| #{translate('websockets')}
-													.col-sm-7
+												.launchpad-status-row
+													span.launchpad-status-label #{translate('websockets')}
+													span.launchpad-status-value
 														+launchpad-check('websocket')
 
 										<!-- break -->
-										hr.thin
+										hr.thin.launchpad-divider
 
 										<!-- other actions -->
-										.row
+										.row.launchpad-section
 											.col-lg-12
-												h2 #{translate('other_actions')}
+												h2.launchpad-section-title.launchpad-section-title-no-top #{translate('other_actions')}
 
-												h3 #{translate('send_test_email')}
-												form.form(
+												h3.launchpad-subsection-title #{translate('send_test_email')}
+												form.form.launchpad-form(
 													data-ol-async-form
 													action='/launchpad/send_test_email'
 													method='POST'
 												)
 													.form-group
 														label.form-label(for='email') Email
-														input.form-control(name='email' type='text' id='email' required)
+														input.form-control.launchpad-input(name='email' type='text' id='email' required)
 													button.btn-primary.btn(type='submit' data-ol-disabled-inflight)
 														span(data-ol-inflight='idle') #{translate("send")}
 														span(hidden data-ol-inflight='pending') #{translate("sending")}…
@@ -198,17 +195,14 @@ block content
 														+formMessages
 
 										<!-- break -->
-										hr.thin
+										hr.thin.launchpad-divider
 
 										<!-- Go to app -->
-										.row
+										.row.launchpad-section
 											.col-lg-12
 												.text-center
-													br
-													p
+													.launchpad-actions.d-flex.flex-column.gap-3.justify-content-center
 														a.btn.btn-secondary(href='/admin')
 															| Go To Admin Panel
-														| &nbsp;
 														a.btn.btn-primary(href='/project')
 															| Start Using #{settings.appName}
-													br
