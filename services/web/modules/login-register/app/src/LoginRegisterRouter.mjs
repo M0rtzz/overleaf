@@ -16,7 +16,7 @@ const registrationRateLimiters = {
 
 function registrationRateLimitHandler(req, res) {
   const rateLimitMessage =
-    'Too many registration attempts from this IP. Please try again after 30 minutes.'
+    'Too many registration attempts from this IP. Please try again after 60 minutes.'
 
   logger.warn({ ip: req.ip }, 'registration rate limit exceeded')
 
