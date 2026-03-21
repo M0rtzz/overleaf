@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { FetchError } from '../../../../infrastructure/fetch-json'
 import IEEELogo from '../../../../shared/svgs/ieee-logo'
 import GoogleLogo from '../../../../shared/svgs/google-logo'
+import HustLogo from '../../../../shared/svgs/hust-logo'
 import OrcidLogo from '../../../../shared/svgs/orcid-logo'
+import OpenIDLogo from '../../../../shared/svgs/openid-logo'
 import LinkingStatus from './status'
 import OLButton from '@/shared/components/ol/ol-button'
 import {
@@ -17,7 +19,9 @@ import {
 const providerLogos: { readonly [p: string]: JSX.Element } = {
   collabratec: <IEEELogo />,
   google: <GoogleLogo />,
+  hust: <HustLogo />,
   orcid: <OrcidLogo />,
+  oidc: <OpenIDLogo />,
 }
 
 type SSOLinkingWidgetProps = {
@@ -67,7 +71,7 @@ export function SSOLinkingWidget({
 
   return (
     <div className="settings-widget-container">
-      <div>{providerLogos[providerId]}</div>
+      <div>{providerLogos[providerId] || providerLogos.oidc}</div>
       <div className="description-container">
         <div className="title-row">
           <h4 id={providerId}>{title}</h4>
