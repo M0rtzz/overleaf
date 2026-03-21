@@ -101,6 +101,12 @@ async function setNewUserPassword(req, res, next) {
           key: 'password-must-be-strong',
         },
       })
+    } else if (error.name === 'ForbiddenError') {
+      return res.status(403).json({
+        message: {
+          key: 'no-password-allowed-due-to-sso',
+        },
+      })
     } else {
       return res.status(500).json({
         message: req.i18n.translate('error_performing_request'),
