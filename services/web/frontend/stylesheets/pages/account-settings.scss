@@ -327,6 +327,21 @@ body.account-settings-page {
   .confirm-email-form-inner {
     color: var(--content-primary-themed);
   }
+
+  #linked-accounts + .settings-widgets-container .title-row {
+    margin-bottom: 0;
+  }
+
+  #linked-accounts + .settings-widgets-container .btn.btn-secondary {
+    color: #098842;
+  }
+
+  #linked-accounts + .settings-widgets-container .btn.btn-secondary:hover,
+  #linked-accounts + .settings-widgets-container .btn.btn-secondary:focus,
+  #linked-accounts + .settings-widgets-container .btn.btn-secondary:focus-visible,
+  #linked-accounts + .settings-widgets-container .btn.btn-secondary:active {
+    color: #1e6b41;
+  }
 }
 
 #settings-page-root {
