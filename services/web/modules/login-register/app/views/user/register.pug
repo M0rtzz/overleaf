@@ -11,18 +11,47 @@ block content
 				.col-lg-6.offset-lg-3.col-xl-4.offset-xl-4
 					.card
 						.card-body
+<<<<<<< HEAD
 							.page-header
 								h1.login-register-header-heading-focus.h3 #{translate("register")}
 							.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
+=======
+							.page-header.login-register-page-header
+								h1.login-register-header-heading-focus(style='font-family: Merriweather, serif; margin-bottom: 12.5px !important;') #{translate("register")}
+								.login-register-hr-text-container(style='margin-top: 1px; padding: 5px 0;')
+								.notification.notification-type-info(style='margin-top: 18px; margin-bottom: 5px;' role='note')
+									.notification-icon
+										+material-symbol('info')
+									.notification-content-and-cta
+										.notification-content.text-left(style='font-family: Lato, sans-serif;')
+											p Registration requires a Chinese education email (email@*.edu.cn) and an invitation code.
+											p Need help or a free code? Contact #[a(href='mailto:' + process.env.OVERLEAF_ADMIN_EMAIL style='color: #098842;')= process.env.OVERLEAF_ADMIN_EMAIL].
+>>>>>>> 9402c0000e (✨ feat: refine register notice layout and linked account button styles)
 							form(
 								data-ol-async-form
 								name="registerForm"
 								action="/register",
 								method="POST",
 								aria-label=translate('create_account')
+								style='margin-top: 0px !important;'
 							)
 								input(name='_csrf' type='hidden' value=csrfToken)
-								+formMessages()
+								.notification.notification-type-success.register-success-notification.mb-3(role='status' aria-live='polite' data-ol-sent hidden)
+									.notification-icon
+										+material-symbol('check_circle')
+									.notification-content.text-left(style='font-family: Lato, sans-serif;')
+										p Your account activation email has been sent. Please check your inbox and follow the instructions to complete activation.
+										p If you don't see the email in your inbox, please check your spam folder first.
+										p If you still can't locate it or encounter other issues, contact us at #[a(href='mailto:' + process.env.OVERLEAF_ADMIN_EMAIL style='color: #098842;')= process.env.OVERLEAF_ADMIN_EMAIL].
+										p(style='font-weight: bold; font-style: italic;') The activation link will expire in one week, after which you'll need to register again.
+								div(data-ol-not-sent)
+									+formMessages()
+								if err_message
+									.notification.notification-type-error.mb-3(style='margin-top: 20px;' role='alert' aria-live='assertive')
+										.notification-icon
+											+material-symbol('error')
+										.notification-content.text-left(style='font-family: Lato, sans-serif;')
+											p= err_message
 								+customFormMessageNewStyle('invalid-password-retry-or-reset', 'danger')
 									| !{translate('email_or_password_wrong_try_again_or_reset', {}, [{ name: 'a', attrs: { href: '/user/password/reset', 'aria-describedby': 'resetPasswordDescription' } }])}
 									span.visually-hidden(id='resetPasswordDescription')

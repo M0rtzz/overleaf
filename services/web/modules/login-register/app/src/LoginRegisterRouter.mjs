@@ -1,10 +1,10 @@
-import logger from "@overleaf/logger"
-import Settings from "@overleaf/settings"
-import RegisterController from './RegisterController.mjs'
-import LoginController from "./LoginController.mjs"
 import AuthenticationController from '../../../../app/src/Features/Authentication/AuthenticationController.mjs'
 import RateLimiterMiddleware from "../../../../app/src/Features/Security/RateLimiterMiddleware.mjs"
 import { RateLimiter } from "../../../../app/src/infrastructure/RateLimiter.mjs"
+import RegisterController from './RegisterController.mjs'
+import LoginController from "./LoginController.mjs"
+import Settings from "@overleaf/settings"
+import logger from "@overleaf/logger"
 
 // Limit registration attempts to 3 per minute per IP
 const registrationRateLimiters = {
@@ -13,6 +13,32 @@ const registrationRateLimiters = {
     duration: 60,
   }),
 }
+
+function registrationRateLimitHandler(req, res) {
+  const rateLimitMessage =
+    'Too many registration attempts from this IP. Please try again after 60 minutes.'
+
+  logger.warn({ ip: req.ip }, 'registration rate limit exceeded')
+
+  if (req.accepts('json')) {
+    return res.status(429).json({
+      message: {
+        type: 'error',
+        text: rateLimitMessage,
+      },
+    })
+  }
+
+  res.status(429)
+  return res.render('user/register', {
+    err_message: rateLimitMessage,
+    csrfToken: req.csrfToken(),
+    showPasswordField: process.env.OVERLEAF_ALLOW_PUBLIC_REGISTRATION === 'true',
+    showInviteCodeField: Boolean(process.env.OVERLEAF_PUBLIC_REGISTRATION_INVITE_CODE),
+    overallThemeOverride: 'system',
+  })
+}
+
 
 export default {
   apply(webRouter) {
