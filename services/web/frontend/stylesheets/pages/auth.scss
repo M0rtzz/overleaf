@@ -215,3 +215,85 @@ form[name='loginForm'] {
     color: #098842;
   }
 }
+
+.content-alt.auth-theme-page.launchpad-page {
+  .launchpad-card-body {
+    padding: var(--spacing-08) var(--spacing-09);
+  }
+
+  .launchpad-hero {
+    margin-bottom: var(--spacing-08);
+  }
+
+  .launchpad-title,
+  .launchpad-section-title,
+  .launchpad-subsection-title,
+  .launchpad-status-value,
+  .status-indicators,
+  .status-indicators h2,
+  .status-indicators h3,
+  .status-indicators label {
+    color: var(--content-primary-themed);
+  }
+
+  .launchpad-section-title {
+    margin-top: 0;
+    margin-bottom: var(--spacing-05);
+  }
+
+  .launchpad-section-title-no-top {
+    margin-top: 0;
+  }
+
+  .launchpad-subsection-title {
+    margin-top: 0;
+    margin-bottom: var(--spacing-04);
+  }
+
+  .launchpad-logo {
+    margin: var(--spacing-05) 0 0;
+  }
+
+  .launchpad-section + .launchpad-divider,
+  .launchpad-divider + .launchpad-section {
+    margin-top: var(--spacing-07);
+  }
+
+  .launchpad-divider {
+    margin-bottom: 0;
+    border-color: var(--border-divider-themed);
+    opacity: 1;
+  }
+
+  .launchpad-help-text,
+  .launchpad-status-label {
+    color: var(--content-secondary-themed);
+  }
+
+  .launchpad-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-04);
+    flex-wrap: wrap;
+  }
+
+  .launchpad-form {
+    margin-top: var(--spacing-03);
+  }
+
+  .launchpad-input {
+    margin-bottom: 0;
+  }
+
+  .launchpad-actions {
+    width: max-content;
+    max-width: 100%;
+    margin: var(--spacing-03) auto 0;
+  }
+
+  .launchpad-actions .btn {
+    margin: 0;
+    width: auto;
+  }
+}

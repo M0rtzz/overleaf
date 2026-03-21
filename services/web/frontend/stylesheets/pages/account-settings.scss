@@ -271,6 +271,36 @@ body.account-settings-page {
     color: var(--link-web-themed);
   }
 
+  .navbar-default .dropdown-menu {
+    --dropdown-background: var(--bg-primary-themed);
+    --dropdown-background-hover: var(--bg-secondary-themed);
+    --dropdown-background-danger-hover: var(--bg-danger-02);
+    --dropdown-text-color: var(--content-primary-themed);
+    --dropdown-text-danger: var(--content-danger-themed);
+    --dropdown-text-danger-hover: var(--content-danger-themed);
+    --dropdown-text-secondary: var(--content-secondary-themed);
+    --dropdown-header-text-color: var(--content-secondary-themed);
+    --dropdown-text-hover: var(--content-primary-themed);
+    --dropdown-background-active: var(--bg-accent-02);
+    --dropdown-text-active: var(--content-primary-themed);
+    --dropdown-border-divider: var(--border-divider-themed);
+    --dropdown-border-width: 1px;
+    --dropdown-border-color: var(--border-primary-themed);
+
+    .dropdown-item,
+    .dropdown-item:visited,
+    .dropdown-menu-button.dropdown-item,
+    .dropdown-menu-button.dropdown-item:visited {
+      color: var(--dropdown-text-color);
+    }
+
+    .dropdown-item.disabled,
+    .dropdown-item[aria-disabled='true'] {
+      color: var(--dropdown-header-text-color);
+      opacity: 1;
+    }
+  }
+
   .form-control,
   .form-select {
     background-color: var(--bg-tertiary-themed);

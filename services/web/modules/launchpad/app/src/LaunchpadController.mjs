@@ -55,6 +55,9 @@ async function launchpadPage(req, res) {
       res.render(Path.resolve(import.meta.dirname, '../views/launchpad'), {
         adminUserExists,
         authMethod,
+        // Launchpad should follow the current device theme cookie if it
+        // exists; otherwise layout-base falls back to the system theme.
+        overallThemeOverride: 'system',
       })
     } else {
       AuthenticationController.setRedirectInSession(req)
@@ -69,6 +72,9 @@ async function launchpadPage(req, res) {
         wsUrl: Settings.wsUrl,
         adminUserExists,
         authMethod,
+        // Launchpad should follow the current device theme cookie if it
+        // exists; otherwise layout-base falls back to the system theme.
+        overallThemeOverride: 'system',
       })
     } else {
       res.redirect('/restricted')

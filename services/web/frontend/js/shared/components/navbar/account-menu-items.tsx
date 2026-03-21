@@ -24,7 +24,12 @@ export function AccountMenuItems({
 
   return (
     <>
-      <Dropdown.Item as="li" disabled role="menuitem">
+      <Dropdown.Item
+        as="li"
+        disabled
+        role="menuitem"
+        className="dropdown-account-email"
+      >
         {sessionUser.email}
       </Dropdown.Item>
       <NavDropdownDivider />
