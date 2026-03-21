@@ -127,6 +127,7 @@ describe('LaunchpadController', function () {
           expect(ctx.res.render).toHaveBeenCalledWith(viewPath, {
             adminUserExists: false,
             authMethod: 'local',
+            overallThemeOverride: 'system',
           })
         })
       })
@@ -186,6 +187,7 @@ describe('LaunchpadController', function () {
             wsUrl: undefined,
             adminUserExists: true,
             authMethod: 'local',
+            overallThemeOverride: 'system',
           })
         })
       })

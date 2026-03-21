@@ -191,7 +191,7 @@ nav.navbar.navbar-default.navbar-main.navbar-expand-lg(
 								| #{translate('Account')}
 							+dropdown-menu.dropdown-menu-end
 								+dropdown-menu-item
-									.disabled.dropdown-item #{getSessionUser().email}
+									.disabled.dropdown-item.dropdown-account-email #{getSessionUser().email}
 								+dropdown-menu-divider
 								+dropdown-menu-link-item(href='/user/settings') #{translate('account_settings')}
 								if nav.showSubscriptionLink
