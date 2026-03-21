@@ -370,6 +370,22 @@ describe('PasswordResetController', function () {
           ctx.PasswordResetController.setNewUserPassword(ctx.req, ctx.res)
         })
       })
+      it('should return 403 for ForbiddenError', async function (ctx) {
+        await new Promise(resolve => {
+          const anError = new Error('oops')
+          anError.name = 'ForbiddenError'
+          ctx.PasswordResetHandler.promises.setNewUserPassword.rejects(anError)
+          ctx.res.status = code => {
+            code.should.equal(403)
+            return ctx.res
+          }
+          ctx.res.json = data => {
+            data.message.key.should.equal('no-password-allowed-due-to-sso')
+            resolve()
+          }
+          ctx.PasswordResetController.setNewUserPassword(ctx.req, ctx.res)
+        })
+      })
       it('should return 500 for other errors', async function (ctx) {
         await new Promise(resolve => {
           const anError = new Error('oops')
