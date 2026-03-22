@@ -16,6 +16,10 @@ on:
       - server-pro
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   DOCKER_REGISTRY: ghcr.io
   IMAGE_NAME: m0rtzz/overleaf
@@ -34,9 +38,9 @@ jobs:
       - name: "Login to GitHub Container Registry"
         uses: docker/login-action@v3.0.0
         with:
-          registry: ${{env.DOCKER_REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # --- We need to sync package-lock.json/i18 to ensure consistency ---
       - name: "Sync package-lock.json And Prepare .dockerignore"
@@ -112,17 +116,17 @@ jobs:
           fi
           tag=$(TZ='Asia/Shanghai' date +'%Y%m%d%H%M')-$github_short_sha
           echo "Building tag: $tag"
-          docker tag sharelatex/sharelatex:latest ${{env.DOCKER_REGISTRY}}/${{env.IMAGE_NAME}}/ops:latest
+          docker tag sharelatex/sharelatex:latest ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}/ops:latest
           docker tag sharelatex/sharelatex:latest ${{env.DOCKER_REGISTRY}}/${{env.IMAGE_NAME}}/ops:$tag
-          docker push ${{env.DOCKER_REGISTRY}}/${{env.IMAGE_NAME}}/ops:latest
-          docker push ${{env.DOCKER_REGISTRY}}/${{env.IMAGE_NAME}}/ops:$tag
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}/ops:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}/ops:$tag
 
       # --- Retention Policy: Delete old images ---
       - name: Delete old images
         uses: snok/container-retention-policy@v2
         with:
-          image-names: overleaf-pro/ops*
+          image-names: overleaf/ops*
           cut-off: A week ago UTC+8
           account-type: personal
           untagged-only: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GHCR_PAT }}
