@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@main
         with:
           ref: main
-          token: ${{secrets.ACCESS_TOKEN}}
+          token: ${{secrets.GITHUB_TOKEN}}
       - name: "Merge Upstream Official Code"
         run: |
           git remote add upstream https://github.com/overleaf/overleaf.git

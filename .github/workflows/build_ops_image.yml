@@ -125,4 +125,4 @@ jobs:
           cut-off: A week ago UTC+8
           account-type: personal
           untagged-only: false
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

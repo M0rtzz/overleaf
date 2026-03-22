@@ -64,7 +64,7 @@ jobs:
         with:
           registry: ${{env.GHCR_REGISTRY}}
           username: ${{github.actor}}
-          password: ${{secrets.ACCESS_TOKEN}}
+          password: ${{secrets.GITHUB_TOKEN}}
       - name: Disable buildx default attestations
         run: |
           echo "BUILDX_NO_DEFAULT_ATTESTATIONS=1" >> $GITHUB_ENV
@@ -106,7 +106,7 @@ jobs:
         with:
           registry: ${{ env.GHCR_REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.ACCESS_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -133,4 +133,4 @@ jobs:
           cut-off: 7 days ago UTC
           account-type: personal
           untagged-only: true
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
