@@ -1,0 +1,431 @@
+extends ../layout-marketing
+
+block css
+	style.
+		body.site-status-page {
+			--status-page-bg: var(--bg-secondary-themed);
+			--status-page-bg-alt: var(--bg-primary-themed);
+			--status-panel: var(--bg-primary-themed);
+			--status-border: var(--border-divider-themed);
+			--status-text: var(--content-primary-themed);
+			--status-muted: var(--content-secondary-themed);
+			--status-shadow: 0 12px 30px rgba(27, 34, 44, 0.08);
+			--status-operational-bg: var(--bg-accent-03);
+			--status-operational-text: var(--content-positive-themed);
+			--status-degraded-bg: var(--bg-warning-03);
+			--status-degraded-text: var(--content-warning-themed);
+			--status-maintenance-bg: var(--bg-danger-03);
+			--status-maintenance-text: var(--content-danger-themed);
+			--status-info-bg: var(--bg-accent-03);
+			--status-info-text: var(--content-positive-themed);
+			--status-accent: var(--bg-accent-01);
+			--status-accent-hover: var(--bg-accent-02);
+			--status-operational-dark-text: #098842;
+			background: var(--status-page-bg);
+			color: var(--status-text);
+		}
+
+		body.site-status-page[data-theme='light'] .navbar-default {
+			--navbar-title-color: var(--content-primary);
+			--navbar-title-color-hover: var(--content-secondary);
+			--navbar-brand-image-url: var(
+				--navbar-brand-image-redesign-url,
+				url('/img/ol-brand/overleaf-green.svg')
+			);
+			--navbar-subdued-color: var(--content-primary);
+			--navbar-subdued-hover-bg: var(--bg-dark-primary);
+			--navbar-subdued-hover-color: var(--content-primary-dark);
+			--navbar-bg: var(--bg-light-primary);
+			--navbar-link-color: var(--content-primary);
+			--navbar-link-border-color: var(--border-primary);
+			--navbar-link-hover-color: var(--content-primary);
+			--navbar-link-hover-bg: var(--bg-light-tertiary);
+			--navbar-link-hover-border-color: var(--border-primary);
+			--navbar-toggler-expanded-bg: none;
+			--navbar-toggler-expanded-color: var(--content-secondary);
+			--navbar-hamburger-submenu-bg: var(--bg-light-secondary);
+			--navbar-hamburger-submenu-item-color: var(--content-primary);
+			--navbar-hamburger-submenu-item-hover-color: var(--content-primary-dark);
+			--navbar-hamburger-submenu-item-hover-bg: var(--bg-dark-primary);
+		}
+
+		body.site-status-page .site-status-main {
+			padding: calc(68px + var(--spacing-10)) 24px 72px;
+			background: linear-gradient(
+				180deg,
+				var(--status-page-bg) 0%,
+				var(--status-page-bg-alt) 100%
+			);
+		}
+
+		body.site-status-page .site-status-shell {
+			max-width: 1120px;
+			margin: 0 auto;
+			display: grid;
+			gap: 24px;
+		}
+
+		body.site-status-page .site-status-topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 18px;
+		}
+
+		body.site-status-page .site-status-brand-lockup {
+			display: inline-flex;
+			align-items: center;
+			gap: 14px;
+		}
+
+		body.site-status-page .site-status-logo {
+			width: 152px;
+			height: 44px;
+			object-fit: contain;
+		}
+
+		body.site-status-page .site-status-logo--light {
+			display: none;
+		}
+
+		body.site-status-page[data-theme='light'] .site-status-logo--dark {
+			display: none;
+		}
+
+		body.site-status-page[data-theme='light'] .site-status-logo--light {
+			display: inline-block;
+		}
+
+		body.site-status-page .site-status-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+
+		body.site-status-page .site-status-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: 0 16px;
+			border-radius: 999px;
+			border: 1px solid var(--status-border);
+			background: var(--status-panel);
+			color: var(--status-text);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+
+		body.site-status-page .site-status-action--primary {
+			background: var(--status-accent);
+			border-color: transparent;
+			color: #fff;
+		}
+
+		body.site-status-page .site-status-action--primary:hover {
+			background: var(--status-accent-hover);
+			color: #fff;
+		}
+
+		body.site-status-page .site-status-hero,
+		body.site-status-page .site-status-card,
+		body.site-status-page .site-status-notices,
+		body.site-status-page .site-status-message {
+			background: var(--status-panel);
+			border: 1px solid var(--status-border);
+			border-radius: 24px;
+			box-shadow: var(--status-shadow);
+		}
+
+		body.site-status-page .site-status-hero {
+			padding: 32px;
+		}
+
+		body.site-status-page .site-status-eyebrow {
+			margin: 0 0 12px;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--status-muted);
+		}
+
+		body.site-status-page .site-status-title {
+			margin: 0 0 12px;
+			font-size: clamp(34px, 5vw, 52px);
+			line-height: 1;
+			color: var(--status-text);
+		}
+
+		body.site-status-page .site-status-summary {
+			margin: 0;
+			max-width: 720px;
+			font-size: 18px;
+			line-height: 1.65;
+			color: var(--status-muted);
+		}
+
+		body.site-status-page .site-status-pill,
+		body.site-status-page .site-status-service-badge,
+		body.site-status-page .site-status-notice-meta {
+			display: inline-flex;
+			align-items: center;
+			padding: 6px 10px;
+			border-radius: 999px;
+			font-size: 12px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+
+		body.site-status-page .site-status-pill {
+			padding: 8px 14px;
+			margin-bottom: 18px;
+			font-size: 14px;
+		}
+
+		body.site-status-page .site-status-pill--operational,
+		body.site-status-page .site-status-service-badge--operational {
+			background: var(--status-operational-bg);
+			color: var(--status-operational-text);
+		}
+
+		body.site-status-page[data-theme='default'] .site-status-pill--operational,
+		body.site-status-page[data-theme='default'] .site-status-service-badge--operational {
+			color: var(--status-operational-dark-text);
+		}
+
+		body.site-status-page .site-status-pill--degraded,
+		body.site-status-page .site-status-service-badge--degraded,
+		body.site-status-page .site-status-notice-meta--degraded {
+			background: var(--status-degraded-bg);
+			color: var(--status-degraded-text);
+		}
+
+		body.site-status-page .site-status-pill--maintenance,
+		body.site-status-page .site-status-service-badge--maintenance,
+		body.site-status-page .site-status-notice-meta--maintenance {
+			background: var(--status-maintenance-bg);
+			color: var(--status-maintenance-text);
+		}
+
+		body.site-status-page .site-status-notice-meta--info {
+			background: var(--status-info-bg);
+			color: var(--status-info-text);
+		}
+
+		body.site-status-page .site-status-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 20px;
+		}
+
+		body.site-status-page .site-status-card {
+			padding: 24px;
+		}
+
+		body.site-status-page .site-status-card-header,
+		body.site-status-page .site-status-section-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 12px;
+		}
+
+		body.site-status-page .site-status-card-title,
+		body.site-status-page .site-status-section-title,
+		body.site-status-page .site-status-notice-title,
+		body.site-status-page .site-status-message-title {
+			margin: 0;
+			color: var(--status-text);
+		}
+
+		body.site-status-page .site-status-card-title {
+			font-size: 21px;
+		}
+
+		body.site-status-page .site-status-section-title {
+			font-size: 20px;
+		}
+
+		body.site-status-page .site-status-message-title,
+		body.site-status-page .site-status-notice-title {
+			font-size: 16px;
+		}
+
+		body.site-status-page .site-status-card-description,
+		body.site-status-page .site-status-section-meta,
+		body.site-status-page .site-status-message p,
+		body.site-status-page .site-status-notice p,
+		body.site-status-page .site-status-empty,
+		body.site-status-page .site-status-html-message,
+		body.site-status-page .site-status-html-message p {
+			color: var(--status-muted);
+			line-height: 1.7;
+		}
+
+		body.site-status-page .site-status-section-meta,
+		body.site-status-page .site-status-empty {
+			font-size: 14px;
+		}
+
+		body.site-status-page .site-status-html-message > :first-child {
+			margin-top: 0;
+		}
+
+		body.site-status-page .site-status-html-message > :last-child {
+			margin-bottom: 0;
+		}
+
+		body.site-status-page .site-status-notices,
+		body.site-status-page .site-status-message {
+			padding: 24px 28px;
+		}
+
+		body.site-status-page .site-status-notices-list {
+			display: grid;
+			gap: 18px;
+		}
+
+		body.site-status-page .site-status-notice {
+			padding: 18px 20px;
+			border-radius: 18px;
+			background: var(--status-page-bg);
+			border: 1px solid var(--status-border);
+		}
+
+		body.site-status-page .site-status-links {
+			margin-top: 16px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px 18px;
+		}
+
+		body.site-status-page .site-status-link {
+			color: var(--status-text);
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		@media (max-width: 900px) {
+			body.site-status-page .site-status-topbar {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			body.site-status-page .site-status-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width: 640px) {
+			body.site-status-page .site-status-main {
+				padding: calc(68px + var(--spacing-07)) 16px 48px;
+			}
+
+			body.site-status-page .site-status-hero,
+			body.site-status-page .site-status-card,
+			body.site-status-page .site-status-notices,
+			body.site-status-page .site-status-message {
+				border-radius: 20px;
+			}
+
+			body.site-status-page .site-status-hero {
+				padding: 24px;
+			}
+
+			body.site-status-page .site-status-logo {
+				width: 132px;
+			}
+
+			body.site-status-page .site-status-actions {
+				width: 100%;
+			}
+
+			body.site-status-page .site-status-action {
+				flex: 1 1 auto;
+			}
+
+			body.site-status-page .site-status-notices,
+			body.site-status-page .site-status-message {
+				padding: 20px;
+			}
+		}
+
+block content
+	main#main-content.site-status-main
+		.site-status-shell
+			section.site-status-hero
+				.site-status-topbar
+					.site-status-brand-lockup
+						img.site-status-logo.site-status-logo--dark(
+							src=buildImgPath('ol-brand/overleaf-white.svg')
+							alt=settings.appName
+						)
+						img.site-status-logo.site-status-logo--light(
+							src=buildImgPath('ol-brand/overleaf-green.svg')
+							alt=settings.appName
+						)
+					.site-status-actions
+						a.site-status-action.site-status-action--primary(
+							href='mailto:' + siteStatus.adminEmail
+						) Contact support
+				p.site-status-eyebrow Website status
+				span.site-status-pill(class={
+					'site-status-pill--operational': siteStatus.overallStatus.tone === 'operational',
+					'site-status-pill--degraded': siteStatus.overallStatus.tone === 'degraded',
+					'site-status-pill--maintenance': siteStatus.overallStatus.tone === 'maintenance',
+				})= siteStatus.overallStatus.label
+				h1.site-status-title #{settings.appName}
+				p.site-status-summary= siteStatus.overallStatus.summary
+
+			section.site-status-grid(aria-label='Service status')
+				each service in siteStatus.services
+					article.site-status-card
+						.site-status-card-header
+							h2.site-status-card-title= service.name
+							span.site-status-service-badge(class={
+								'site-status-service-badge--operational': service.tone === 'operational',
+								'site-status-service-badge--degraded': service.tone === 'degraded',
+								'site-status-service-badge--maintenance': service.tone === 'maintenance',
+							})= service.label
+						p.site-status-card-description= service.description
+
+			section.site-status-notices
+				.site-status-section-head
+					h2.site-status-section-title Current notices
+					span.site-status-section-meta Live information from maintenance settings and system messages.
+				if siteStatus.announcements.length
+					.site-status-notices-list
+						each announcement in siteStatus.announcements
+							article.site-status-notice
+								h3.site-status-notice-title= announcement.title
+								span.site-status-notice-meta(class={
+									'site-status-notice-meta--degraded': announcement.tone === 'degraded',
+									'site-status-notice-meta--maintenance': announcement.tone === 'maintenance',
+									'site-status-notice-meta--info': announcement.tone === 'info' || announcement.tone === 'operational',
+								})= announcement.tone === 'info' ? 'Notice' : siteStatus.overallStatus.label
+								if announcement.isHtml
+									.site-status-html-message !{announcement.content}
+								else
+									p.site-status-empty= announcement.content
+				else
+					p.site-status-empty No active maintenance notices or system messages.
+
+			section.site-status-message
+				h2.site-status-message-title Need help?
+				p Contact the support team if you need help restoring access or confirming whether maintenance is still active.
+				.site-status-links
+					a.site-status-link(href='mailto:' + siteStatus.adminEmail) Contact support
+					if siteStatus.statusPageUrl
+						a.site-status-link(
+							href=siteStatus.statusPageUrl
+							target='_blank'
+							rel='noreferrer'
+						) Historic status

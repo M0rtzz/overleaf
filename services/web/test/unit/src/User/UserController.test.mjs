@@ -242,6 +242,7 @@ describe('UserController', function () {
     ctx.UserController = (await import(modulePath)).default
 
     ctx.res = {
+      cookie: sinon.stub(),
       send: sinon.stub(),
       status: sinon.stub(),
       sendStatus: sinon.stub(),
@@ -770,6 +771,40 @@ describe('UserController', function () {
   describe('logout', function () {
     beforeEach(function (ctx) {
       ctx.RequestContentTypeDetection.acceptsJson.returns(false)
+    })
+
+    it('should persist the current user overall theme to the device cookie', function (ctx) {
+      return new Promise(resolve => {
+        ctx.req.session.user.ace = { overallTheme: 'light-' }
+        ctx.req.session.destroy = sinon.stub().callsArgWith(0)
+        ctx.res.redirect = url => {
+          url.should.equal('/login')
+          ctx.res.cookie.should.have.been.calledWith('ol-overallTheme', 'light-', {
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax',
+          })
+          resolve()
+        }
+
+        ctx.UserController.logout(ctx.req, ctx.res)
+      })
+    })
+
+    it('should persist dark overall theme as a dark cookie value on logout', function (ctx) {
+      return new Promise(resolve => {
+        ctx.req.session.user.ace = { overallTheme: '' }
+        ctx.req.session.destroy = sinon.stub().callsArgWith(0)
+        ctx.res.redirect = url => {
+          url.should.equal('/login')
+          ctx.res.cookie.should.have.been.calledWith('ol-overallTheme', 'dark', {
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax',
+          })
+          resolve()
+        }
+
+        ctx.UserController.logout(ctx.req, ctx.res)
+      })
     })
 
     it('should destroy the session', function (ctx) {

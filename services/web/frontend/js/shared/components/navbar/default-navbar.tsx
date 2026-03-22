@@ -6,6 +6,7 @@ import useWaitForI18n from '@/shared/hooks/use-wait-for-i18n'
 import AdminMenu from '@/shared/components/navbar/admin-menu'
 import type { DefaultNavbarMetadata } from '@/shared/components/types/default-navbar-metadata'
 import NavItemFromData from '@/shared/components/navbar/nav-item-from-data'
+import NavLinkItem from '@/shared/components/navbar/nav-link-item'
 import LoggedInItems from '@/shared/components/navbar/logged-in-items'
 import LoggedOutItems from '@/shared/components/navbar/logged-out-items'
 import HeaderLogoOrTitle from '@/shared/components/navbar/header-logo-or-title'
@@ -143,6 +144,7 @@ function DefaultNavbar(
                       />
                     ) : null
                   })}
+                  <NavLinkItem href="/site-status">Status</NavLinkItem>
                   {sessionUser ? (
                     <LoggedInItems
                       sessionUser={sessionUser}

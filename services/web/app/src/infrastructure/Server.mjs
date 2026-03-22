@@ -262,7 +262,8 @@ await expressLocals(webRouter, privateApiRouter, publicApiRouter)
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 
 webRouter.use(function checkIfSiteClosed(req, res, next) {
-  if (Settings.siteIsOpen) {
+  const isStatusPage = ['/site-status', '/site_status'].includes(req.path)
+  if (Settings.siteIsOpen || isStatusPage) {
     next()
   } else if (hasAdminAccess(SessionManager.getSessionUser(req.session))) {
     next()
@@ -272,7 +273,8 @@ webRouter.use(function checkIfSiteClosed(req, res, next) {
 })
 
 webRouter.use(function checkIfEditorClosed(req, res, next) {
-  if (Settings.editorIsOpen) {
+  const isStatusPage = ['/site-status', '/site_status'].includes(req.path)
+  if (Settings.editorIsOpen || isStatusPage) {
     next()
   } else if (req.url.indexOf('/admin') === 0) {
     next()

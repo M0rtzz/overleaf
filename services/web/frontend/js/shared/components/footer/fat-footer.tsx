@@ -84,7 +84,7 @@ function FatFooter() {
       links: [
         { href: '/learn', label: t('Documentation') },
         { href: '/contact', label: t('footer_contact_us') },
-        { href: 'https://status.overleaf.com/', label: t('website_status') },
+        { href: '/site-status', label: t('website_status') },
       ],
     },
   ]

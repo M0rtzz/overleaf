@@ -339,6 +339,14 @@ const updateUserSettingsSchema = z.object({
   // TODO: complete the schema and remove the passthrough
 })
 
+function setOverallThemeCookie(res, overallTheme = 'system') {
+  const overallThemeCookieValue = overallTheme === '' ? 'dark' : overallTheme
+  res.cookie('ol-overallTheme', overallThemeCookieValue, {
+    maxAge: 365 * 24 * 60 * 60 * 1000,
+    sameSite: 'lax',
+  })
+}
+
 async function updateUserSettings(req, res, next) {
   const { body } = parseReq(req, updateUserSettingsSchema)
   const userId = SessionManager.getLoggedInUserId(req.session)
@@ -419,12 +427,7 @@ async function updateUserSettings(req, res, next) {
   await user.save()
 
   if (body.overallTheme != null) {
-    const overallThemeCookieValue =
-      body.overallTheme === '' ? 'dark' : body.overallTheme
-    res.cookie('ol-overallTheme', overallThemeCookieValue, {
-      maxAge: 365 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-    })
+    setOverallThemeCookie(res, body.overallTheme)
   }
 
   const newEmail = body.email?.trim().toLowerCase()
@@ -530,6 +533,11 @@ async function logout(req, res, next) {
     ? UrlHelper.getSafeRedirectPath(req.body.redirect)
     : undefined
   const redirectUrl = requestedRedirect || '/login'
+  const user = SessionManager.getSessionUser(req.session)
+
+  if (user != null) {
+    setOverallThemeCookie(res, user.ace?.overallTheme ?? 'system')
+  }
 
   await doLogout(req)
 

@@ -10,12 +10,16 @@
  */
 import HomeController from './HomeController.mjs'
 
+import SiteStatusController from './SiteStatusController.mjs'
+
 import UniversityController from './UniversityController.mjs'
 
 export default {
   apply(webRouter) {
     webRouter.get('/', HomeController.index)
     webRouter.get('/home', HomeController.home)
+    webRouter.get('/site-status', SiteStatusController.page)
+    webRouter.get('/site_status', SiteStatusController.page)
 
     webRouter.get(
       '/planned_maintenance',

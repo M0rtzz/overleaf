@@ -148,6 +148,9 @@ nav.navbar.navbar-default.navbar-main.navbar-expand-lg(
 									else
 										| !{translate(item.text)}
 
+					+nav-item
+						+nav-link(href='/site-status') Status
+
 					// logged out
 					if !getSessionUser()
 						// register link

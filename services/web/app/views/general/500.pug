@@ -21,7 +21,11 @@ block body
 								a(href='mailto:' + settings.adminEmail target='_blank') #{settings.adminEmail}
 								| .
 						else
-							| If the problem persists, please contact us at
+							| If the problem persists, please check our
+							|
+							a(href='/site-status') status page
+							|
+							| or contact us at
 							|
 							a(href='mailto:' + settings.adminEmail target='_blank') #{settings.adminEmail}
 							| .

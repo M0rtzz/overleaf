@@ -267,6 +267,9 @@ async function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthenticationController.addEndpointToLoginWhitelist('/register')
   }
 
+  AuthenticationController.addEndpointToLoginWhitelist('/site-status')
+  AuthenticationController.addEndpointToLoginWhitelist('/site_status')
+
   EditorRouter.apply(webRouter, privateApiRouter)
   CollaboratorsRouter.apply(webRouter, privateApiRouter)
   SubscriptionRouter.apply(webRouter, privateApiRouter, publicApiRouter)
