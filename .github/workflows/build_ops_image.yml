@@ -37,7 +37,7 @@ jobs:
           registry: ${{env.DOCKER_REGISTRY}}
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
-      
+
       # --- We need to sync package-lock.json/i18 to ensure consistency ---
       - name: "Sync package-lock.json And Prepare .dockerignore"
         run: |
@@ -78,7 +78,7 @@ jobs:
           provenance: false
           sbom: false
       # --- End of Base Image ---
-      
+
       # --- Build Server Image ---
       - name: "Get MONOREPO_REVISION"
         id: vars

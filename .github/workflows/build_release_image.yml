@@ -23,10 +23,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - platform: linux/amd64
-          runner: ubuntu-latest
-        - platform: linux/arm64
-          runner: ubuntu-24.04-arm
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Get latest release branch
@@ -64,7 +64,7 @@ jobs:
           registry: ${{ env.GHCR_REGISTRY }}
           username: ${{github.actor}}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       # --- We need to sync package-lock.json/i18 to ensure consistency ---
       - name: "Sync package-lock.json And Prepare .dockerignore"
         run: |
@@ -72,7 +72,7 @@ jobs:
           docker run --rm -v "$(pwd)/services/web/":/overleaf/services/web -w /overleaf/services/web ghcr.io/m0rtzz/overleaf/dev:webpack npm run extract-translations
           cd ./server-ce/
           cp .dockerignore ../
-      
+
       # --- Set up Docker ---
       # See: https://docs.docker.com/build/ci/github-actions/multi-platform/
       - name: Set up Docker (enable containerd image store)
@@ -118,7 +118,7 @@ jobs:
           outputs: type=image,name-canonical=true,push=true
           provenance: false
           sbom: false
-      
+
       - name: Export digest
         run: |
           mkdir -p ${{ runner.temp }}/digests
@@ -190,10 +190,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - platform: linux/amd64
-          runner: ubuntu-latest
-        - platform: linux/arm64
-          runner: ubuntu-24.04-arm
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Get latest release branch
