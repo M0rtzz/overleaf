@@ -287,13 +287,15 @@ form[name='loginForm'] {
   }
 
   .launchpad-actions {
-    width: max-content;
-    max-width: 100%;
+    width: 100%;
     margin: var(--spacing-03) auto 0;
   }
 
   .launchpad-actions .btn {
     margin: 0;
-    width: auto;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
   }
 }

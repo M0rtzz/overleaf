@@ -39,6 +39,8 @@ block append meta
 	meta(name='ol-ideJsPath' content=buildJsPath('ide.js'))
 
 block content
+	- const adminPanelLabel = 'Go To Admin Panel'
+	- const projectLabel = `Start Using ${settings.appName}`
 	script(
 		type='text/javascript'
 		nonce=scriptNonce
@@ -203,6 +205,6 @@ block content
 												.text-center
 													.launchpad-actions.d-flex.flex-column.gap-3.justify-content-center
 														a.btn.btn-secondary(href='/admin')
-															| Go To Admin Panel
+															| #{adminPanelLabel}
 														a.btn.btn-primary(href='/project')
-															| Start Using #{settings.appName}
+															| #{projectLabel}
