@@ -1,5 +1,6 @@
 import AdminController from './Features/ServerAdmin/AdminController.mjs'
 import ErrorController from './Features/Errors/ErrorController.mjs'
+import HttpErrorHandler from './Features/Errors/HttpErrorHandler.mjs'
 import Features from './infrastructure/Features.mjs'
 import ProjectController from './Features/Project/ProjectController.mjs'
 import ProjectApiController from './Features/Project/ProjectApiController.mjs'
@@ -269,6 +270,9 @@ async function initialize(webRouter, privateApiRouter, publicApiRouter) {
 
   AuthenticationController.addEndpointToLoginWhitelist('/site-status')
   AuthenticationController.addEndpointToLoginWhitelist('/site_status')
+  AuthenticationController.addEndpointToLoginWhitelist('/__debug/404')
+  AuthenticationController.addEndpointToLoginWhitelist('/__debug/400')
+  AuthenticationController.addEndpointToLoginWhitelist('/__debug/500')
 
   EditorRouter.apply(webRouter, privateApiRouter)
   CollaboratorsRouter.apply(webRouter, privateApiRouter)
@@ -1239,6 +1243,20 @@ async function initialize(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.get('/unsupported-browser', renderUnsupportedBrowserPage)
+
+  webRouter.get('/__debug/404', ErrorController.notFound)
+
+  webRouter.get('/__debug/400', (req, res) => {
+    HttpErrorHandler.badRequest(
+      req,
+      res,
+      'We could not process this request. Please review the submitted information and try again.'
+    )
+  })
+
+  webRouter.get('/__debug/500', (req, res) => {
+    throw new Error('debug 500')
+  })
 
   webRouter.get('*', ErrorController.notFound)
 }

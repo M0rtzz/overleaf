@@ -1,7 +1,11 @@
 import logger from '@overleaf/logger'
 import Settings from '@overleaf/settings'
 import { plainTextResponse } from '../../infrastructure/Response.mjs'
-import { getOverallThemeFromRequestCookie } from '../../infrastructure/OverallTheme.mjs'
+import SessionManager from '../Authentication/SessionManager.mjs'
+import {
+  getOverallThemeFromRequestCookie,
+  getThemeRenderOptions,
+} from '../../infrastructure/OverallTheme.mjs'
 
 function renderJSONError(res, message, info = {}) {
   if (info.message) {
@@ -18,10 +22,15 @@ function renderJSONError(res, message, info = {}) {
 }
 
 function handleGeneric500Error(req, res, statusCode, message) {
+  const sessionUser = SessionManager.getSessionUser(req.session)
   res.status(statusCode)
   switch (req.accepts(['html', 'json'])) {
     case 'html':
-      return res.render('general/500', { title: 'Server Error' })
+      return res.render('general/500', {
+        title: 'Server Error',
+        message,
+        ...getThemeRenderOptions(req, sessionUser),
+      })
     case 'json':
       return renderJSONError(res, message)
     default:
@@ -30,12 +39,14 @@ function handleGeneric500Error(req, res, statusCode, message) {
 }
 
 function handleGeneric400Error(req, res, statusCode, message, info = {}) {
+  const sessionUser = SessionManager.getSessionUser(req.session)
   res.status(statusCode)
   switch (req.accepts(['html', 'json'])) {
     case 'html':
       return res.render('general/400', {
         title: 'Client Error',
         message,
+        ...getThemeRenderOptions(req, sessionUser),
       })
     case 'json':
       return renderJSONError(res, message, info)
@@ -107,10 +118,14 @@ export default HttpErrorHandler = {
   },
 
   notFound(req, res, message = 'not found', info = {}) {
+    const sessionUser = SessionManager.getSessionUser(req.session)
     res.status(404)
     switch (req.accepts(['html', 'json'])) {
       case 'html':
-        return res.render('general/404', { title: 'page_not_found' })
+        return res.render('general/404', {
+          title: 'page_not_found',
+          ...getThemeRenderOptions(req, sessionUser),
+        })
       case 'json':
         return renderJSONError(res, message, info)
       default:
