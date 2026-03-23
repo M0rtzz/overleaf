@@ -1,33 +1,321 @@
-extends ../layout/layout-no-js
+extends ../layout-marketing
 
 block vars
-	- metadata = {title: 'Something went wrong'}
+	- showThinFooter = true
+	- forceLightMarketingNavbar = true
+	- additionalBodyClasses = [...new Set([...(Array.isArray(additionalBodyClasses) ? additionalBodyClasses : []), 'server-error-page'])]
 
-block body
-	body.full-height
-		main#main-content.content.content-alt.full-height
-			.container.full-height
-				.error-container.full-height
-					.error-details
-						p.error-status Something went wrong, sorry.
-						if settings.statusPageUrl
-							p.error-description Our staff are probably looking into this, but if it continues, please check our status page at
-								|
-								|
-								a(href=settings.statusPageUrl target='_blank') #{new URL(settings.statusPageUrl).hostname}
-								|
-								| or contact us at
-								|
-								a(href='mailto:' + settings.adminEmail target='_blank') #{settings.adminEmail}
-								| .
+append css
+	style.
+		.server-error-main {
+			--server-error-page-bg: var(--bg-secondary-themed);
+			--server-error-panel: var(--bg-primary-themed);
+			--server-error-panel-alt: var(--bg-secondary-themed);
+			--server-error-border: var(--border-divider-themed);
+			--server-error-text: var(--content-primary-themed);
+			--server-error-muted: var(--content-secondary-themed);
+			--server-error-shadow: 0 18px 42px rgba(27, 34, 44, 0.1);
+			--server-error-pill-bg: #f5e4e4;
+			--server-error-pill-text: var(--content-danger-themed);
+			--server-error-link: #098842;
+			min-height: calc(100dvh - 50px);
+			padding: calc(68px + 32px) 24px 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--server-error-page-bg);
+			color: var(--server-error-text);
+			box-sizing: border-box;
+		}
+
+		.server-error-shell {
+			width: min(100%, 860px);
+		}
+
+		.server-error-card {
+			position: relative;
+			overflow: hidden;
+			padding: 36px;
+			border-radius: 28px;
+			border: 1px solid var(--server-error-border);
+			background: var(--server-error-panel);
+			box-shadow: var(--server-error-shadow);
+		}
+
+		.server-error-card::after {
+			content: '';
+			position: absolute;
+			top: -88px;
+			right: -72px;
+			width: 240px;
+			height: 240px;
+			border-radius: 50%;
+			background: rgba(0, 160, 84, 0.16);
+			pointer-events: none;
+		}
+
+		.server-error-content {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			gap: 24px;
+		}
+
+		.server-error-brand-lockup {
+			display: inline-flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.server-error-brand-lockup .server-error-eyebrow {
+			text-align: center;
+		}
+
+		.server-error-logo {
+			width: 152px;
+			height: 44px;
+			object-fit: contain;
+		}
+
+		.server-error-logo--light {
+			display: none;
+		}
+
+		body[data-theme='light'] .server-error-logo--dark {
+			display: none;
+		}
+
+		body[data-theme='light'] .server-error-logo--light {
+			display: inline-block;
+		}
+
+		.server-error-eyebrow {
+			margin: 0;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--server-error-muted);
+		}
+
+		.server-error-pill,
+		.server-error-panel-meta {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 8px 14px;
+			border-radius: 999px;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.server-error-pill {
+			justify-self: center;
+			background: var(--server-error-pill-bg);
+			color: var(--server-error-pill-text);
+		}
+
+		.server-error-title-block {
+			display: grid;
+			gap: 12px;
+			text-align: center;
+		}
+
+		.server-error-title {
+			margin: 0;
+			font-size: clamp(34px, 5vw, 54px);
+			line-height: 1.12;
+			color: var(--server-error-text);
+		}
+
+		.server-error-summary {
+			max-width: 640px;
+			margin: 0 auto;
+			font-size: 18px;
+			line-height: 1.7;
+			color: var(--server-error-muted);
+		}
+
+		.server-error-panel {
+			padding: 24px 28px;
+			border-radius: 22px;
+			border: 1px solid var(--server-error-border);
+			background: var(--server-error-panel-alt);
+		}
+
+		.server-error-panel-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 12px;
+		}
+
+		.server-error-panel-title {
+			margin: 0;
+			font-size: 21px;
+			color: var(--server-error-text);
+		}
+
+		.server-error-panel-meta {
+			background: #d6f1e2;
+			color: #098842;
+			padding: 6px 10px;
+			font-size: 12px;
+		}
+
+		.server-error-copy {
+			margin: 0;
+			font-size: 16px;
+			line-height: 1.7;
+			color: var(--server-error-muted);
+		}
+
+		.server-error-link,
+		.server-error-link:visited,
+		.server-error-link:hover,
+		.server-error-link:focus {
+			color: var(--server-error-link);
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		.server-error-actions {
+			margin-top: 18px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+
+		.server-error-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: 0 16px;
+			border-radius: 999px;
+			border: 1px solid var(--server-error-border);
+			background: var(--server-error-panel);
+			color: var(--server-error-text);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+
+		.server-error-action:visited,
+		.server-error-action:hover,
+		.server-error-action:focus {
+			color: var(--server-error-text);
+			background: var(--server-error-page-bg);
+			text-decoration: none;
+		}
+
+		.server-error-action--primary,
+		.server-error-action--primary:visited {
+			border-color: transparent;
+			background: var(--bg-accent-01);
+			color: #fff;
+		}
+
+		.server-error-action--primary:hover,
+		.server-error-action--primary:focus {
+			background: var(--bg-accent-02);
+			color: #fff;
+		}
+
+		@media (max-width: 640px) {
+			.server-error-main {
+				padding: calc(68px + 24px) 16px 24px;
+			}
+
+			.server-error-card {
+				padding: 24px;
+				border-radius: 24px;
+			}
+
+			.server-error-panel {
+				padding: 20px;
+				border-radius: 18px;
+			}
+
+			.server-error-logo {
+				width: 132px;
+			}
+
+			.server-error-panel-head {
+				align-items: flex-start;
+				flex-wrap: wrap;
+			}
+
+			.server-error-actions {
+				flex-direction: column;
+			}
+
+			.server-error-action {
+				width: 100%;
+			}
+		}
+
+block content
+	- var statusPageHref = settings.statusPageUrl || '/site-status'
+	- var statusPageIsExternal = /^https?:\/\//.test(statusPageHref)
+	- var sessionUser = typeof getSessionUser === 'function' ? getSessionUser() : null
+	- var primaryHref = sessionUser ? '/project' : '/'
+	- var primaryLabel = sessionUser ? 'Open projects' : 'Go home'
+	main#main-content.content.content-alt.sessions-page.server-error-main
+		.server-error-shell
+			section.server-error-card(aria-labelledby='server-error-title')
+				.server-error-content
+					.server-error-brand-lockup
+						img.server-error-logo.server-error-logo--dark(
+							src=buildImgPath('ol-brand/overleaf-white.svg')
+							alt=settings.appName
+						)
+						img.server-error-logo.server-error-logo--light(
+							src=buildImgPath('ol-brand/overleaf-green.svg')
+							alt=settings.appName
+						)
+						p.server-error-eyebrow Error page
+					span.server-error-pill 500 Error
+					.server-error-title-block
+						h1#server-error-title.server-error-title We hit a server problem
+						p.server-error-summary
+							| The page loaded into an unexpected server error. The issue may be temporary while the service recovers.
+					section.server-error-panel(aria-labelledby='server-error-next-step-title')
+						.server-error-panel-head
+							h2#server-error-next-step-title.server-error-panel-title What you can do now
+							span.server-error-panel-meta Next step
+						p.server-error-copy
+							| Wait a moment and try again, or return to a known page while we recover the request.
+						.server-error-actions
+							a.server-error-action.server-error-action--primary(href=primaryHref)= primaryLabel
+							a.server-error-action(
+								href=statusPageHref
+								target=statusPageIsExternal ? '_blank' : undefined
+								rel=statusPageIsExternal ? 'noreferrer' : undefined
+							) View status page
+					section.server-error-panel(aria-labelledby='server-error-help-title')
+						.server-error-panel-head
+							h2#server-error-help-title.server-error-panel-title Need help?
+						if settings.adminEmail
+							p.server-error-copy
+								| If the problem persists, contact
+								= ' '
+								a.server-error-link(href='mailto:' + settings.adminEmail) the support team
+								|  and include the page or action that triggered this error.
 						else
-							| If the problem persists, please check our
-							|
-							a(href='/site-status') status page
-							|
-							| or contact us at
-							|
-							a(href='mailto:' + settings.adminEmail target='_blank') #{settings.adminEmail}
-							| .
-						p.error-actions
-							a.error-btn(href='/') Home
+							p.server-error-copy
+								| If the problem persists, check
+								= ' '
+								a.server-error-link(
+									href=statusPageHref
+									target=statusPageIsExternal ? '_blank' : undefined
+									rel=statusPageIsExternal ? 'noreferrer' : undefined
+								) the status page
+								|  for updates before trying again.

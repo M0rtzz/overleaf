@@ -4,11 +4,16 @@ import SessionManager from '../Authentication/SessionManager.mjs'
 import SamlLogHandler from '../SamlLog/SamlLogHandler.mjs'
 import HttpErrorHandler from './HttpErrorHandler.mjs'
 import { plainTextResponse } from '../../infrastructure/Response.mjs'
+import { getThemeRenderOptions } from '../../infrastructure/OverallTheme.mjs'
 import { expressifyErrorHandler } from '@overleaf/promise-utils'
 
 function notFound(req, res) {
+  const sessionUser = SessionManager.getSessionUser(req.session)
   res.status(404)
-  res.render('general/404', { title: 'page_not_found' })
+  res.render('general/404', {
+    title: 'page_not_found',
+    ...getThemeRenderOptions(req, sessionUser),
+  })
 }
 
 function forbidden(req, res) {
@@ -17,8 +22,12 @@ function forbidden(req, res) {
 }
 
 function serverError(req, res) {
+  const sessionUser = SessionManager.getSessionUser(req.session)
   res.status(500)
-  res.render('general/500', { title: 'Server Error' })
+  res.render('general/500', {
+    title: 'Server Error',
+    ...getThemeRenderOptions(req, sessionUser),
+  })
 }
 
 async function handleError(error, req, res, next) {
@@ -48,7 +57,10 @@ async function handleError(error, req, res, next) {
     req.logger.setLevel('warn')
     if (shouldSendErrorResponse) {
       res.status(400)
-      res.render('general/500', { title: 'Invalid Error' })
+      res.render('general/500', {
+        title: 'Invalid Error',
+        ...getThemeRenderOptions(req, user),
+      })
     }
   } else if (error instanceof Errors.ForbiddenError) {
     req.logger.setLevel('warn')
@@ -100,7 +112,10 @@ async function handleError(error, req, res, next) {
     res.status(400)
     if (shouldSendErrorResponse) {
       const validationError = fromZodError(error)
-      res.render('general/400', { message: validationError.message })
+      res.render('general/400', {
+        message: validationError.message,
+        ...getThemeRenderOptions(req, user),
+      })
     }
   } else {
     req.logger.setLevel('error')

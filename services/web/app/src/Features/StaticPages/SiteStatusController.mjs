@@ -2,10 +2,7 @@ import Settings from '@overleaf/settings'
 import SessionManager from '../Authentication/SessionManager.mjs'
 import SystemMessageManager from '../SystemMessages/SystemMessageManager.mjs'
 import { getSiteStatusHealthSnapshot } from '../HealthCheck/HealthCheckManager.mjs'
-import {
-  getOverallThemeFromRequestCookie,
-  normalizeOverallTheme,
-} from '../../infrastructure/OverallTheme.mjs'
+import { getThemeRenderOptions } from '../../infrastructure/OverallTheme.mjs'
 
 const SMOKE_STEPS = {
   login: 'run.002_login',
@@ -17,20 +14,6 @@ const SMOKE_FAILURE_STEPS = {
   login: new Set(['run.000_getLoginCsrf', 'run.002_login']),
   website: new Set(['run.100_loadProjectDashboard']),
   editor: new Set(['run.101_loadEditor']),
-}
-
-function getThemeRenderOptions(req) {
-  const sessionUser = SessionManager.getSessionUser(req.session)
-  if (!sessionUser) {
-    return {
-      overallThemeOverride: getOverallThemeFromRequestCookie(req),
-    }
-  }
-
-  return {
-    overallThemeOverride: normalizeOverallTheme(sessionUser.ace?.overallTheme),
-    ignoreOverallThemeCookie: true,
-  }
 }
 
 function getSmokeServiceState(serviceKey, healthSnapshot) {
@@ -367,7 +350,10 @@ export default {
             adminEmail: Settings.adminEmail,
             statusPageUrl: Settings.statusPageUrl,
           },
-          ...getThemeRenderOptions(req),
+          ...getThemeRenderOptions(
+            req,
+            SessionManager.getSessionUser(req.session)
+          ),
         })
       })
       .catch(next)

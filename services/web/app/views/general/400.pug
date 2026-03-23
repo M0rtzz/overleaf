@@ -1,28 +1,353 @@
-extends ../layout/layout-no-js
+extends ../layout-marketing
+include ../_mixins/notification
 
 block vars
-	- metadata = {title: 'Something went wrong'}
+	- showThinFooter = true
+	- forceLightMarketingNavbar = true
+	- additionalBodyClasses = [...new Set([...(Array.isArray(additionalBodyClasses) ? additionalBodyClasses : []), 'client-error-page'])]
 
-block body
-	body.full-height
-		main#main-content.content.content-alt.full-height
-			.container.full-height
-				.error-container.full-height
-					.error-details
-						p.error-status Something went wrong, sorry.
-						p.error-description
-							| There was a problem with your request.
-							if message
-								|
-								| The error is:
+append css
+	style.
+		.client-error-main {
+			--client-error-page-bg: var(--bg-secondary-themed);
+			--client-error-panel: var(--bg-primary-themed);
+			--client-error-panel-alt: var(--bg-secondary-themed);
+			--client-error-border: var(--border-divider-themed);
+			--client-error-text: var(--content-primary-themed);
+			--client-error-muted: var(--content-secondary-themed);
+			--client-error-shadow: 0 18px 42px rgba(27, 34, 44, 0.1);
+			--client-error-pill-bg: #f9ead4;
+			--client-error-pill-text: var(--content-warning-themed);
+			--client-error-link: #098842;
+			min-height: calc(100dvh - 50px);
+			padding: calc(68px + 32px) 24px 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--client-error-page-bg);
+			color: var(--client-error-text);
+			box-sizing: border-box;
+		}
+
+		.client-error-shell {
+			width: min(100%, 860px);
+		}
+
+		.client-error-card {
+			position: relative;
+			overflow: hidden;
+			padding: 36px;
+			border-radius: 28px;
+			border: 1px solid var(--client-error-border);
+			background: var(--client-error-panel);
+			box-shadow: var(--client-error-shadow);
+		}
+
+		.client-error-card::after {
+			content: '';
+			position: absolute;
+			top: -88px;
+			right: -72px;
+			width: 240px;
+			height: 240px;
+			border-radius: 50%;
+			background: rgba(0, 160, 84, 0.16);
+			pointer-events: none;
+		}
+
+		.client-error-content {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			gap: 24px;
+		}
+
+		.client-error-brand-lockup {
+			display: inline-flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.client-error-brand-lockup .client-error-eyebrow {
+			text-align: center;
+		}
+
+		.client-error-logo {
+			width: 152px;
+			height: 44px;
+			object-fit: contain;
+		}
+
+		.client-error-logo--light {
+			display: none;
+		}
+
+		body[data-theme='light'] .client-error-logo--dark {
+			display: none;
+		}
+
+		body[data-theme='light'] .client-error-logo--light {
+			display: inline-block;
+		}
+
+		.client-error-eyebrow {
+			margin: 0;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--client-error-muted);
+		}
+
+		.client-error-pill,
+		.client-error-panel-meta {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 8px 14px;
+			border-radius: 999px;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.client-error-pill {
+			justify-self: center;
+			background: var(--client-error-pill-bg);
+			color: var(--client-error-pill-text);
+		}
+
+		.client-error-title-block {
+			display: grid;
+			gap: 12px;
+			text-align: center;
+		}
+
+		.client-error-title {
+			margin: 0;
+			font-size: clamp(34px, 5vw, 54px);
+			line-height: 1.12;
+			color: var(--client-error-text);
+		}
+
+		.client-error-summary {
+			max-width: 640px;
+			margin: 0 auto;
+			font-size: 18px;
+			line-height: 1.7;
+			color: var(--client-error-muted);
+		}
+
+		.client-error-panel {
+			padding: 24px 28px;
+			border-radius: 22px;
+			border: 1px solid var(--client-error-border);
+			background: var(--client-error-panel-alt);
+		}
+
+		.client-error-panel-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 12px;
+		}
+
+		.client-error-panel-title {
+			margin: 0;
+			font-size: 21px;
+			color: var(--client-error-text);
+		}
+
+		.client-error-panel-meta {
+			background: #d6f1e2;
+			color: #098842;
+			padding: 6px 10px;
+			font-size: 12px;
+		}
+
+		.client-error-copy {
+			margin: 0;
+			font-size: 16px;
+			line-height: 1.7;
+			color: var(--client-error-muted);
+		}
+
+		.client-error-message {
+			margin-top: 16px;
+		}
+
+		.client-error-message .notification-content p,
+		.client-error-message .notification-content p:last-child {
+			margin-bottom: 0;
+		}
+
+		.client-error-message .notification-content p:first-child {
+			margin-bottom: 6px;
+		}
+
+		.client-error-message .notification a:not(.btn),
+		.client-error-message .notification a:not(.btn):visited,
+		.client-error-message .notification a:not(.btn):hover,
+		.client-error-message .notification a:not(.btn):focus,
+		.client-error-message .notification a:not(.btn):active {
+			color: #098842;
+			text-decoration-color: currentColor;
+		}
+
+		.client-error-link,
+		.client-error-link:visited,
+		.client-error-link:hover,
+		.client-error-link:focus {
+			color: var(--client-error-link);
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		.client-error-actions {
+			margin-top: 18px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+
+		.client-error-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: 0 16px;
+			border-radius: 999px;
+			border: 1px solid var(--client-error-border);
+			background: var(--client-error-panel);
+			color: var(--client-error-text);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+
+		.client-error-action:visited,
+		.client-error-action:hover,
+		.client-error-action:focus {
+			color: var(--client-error-text);
+			background: var(--client-error-page-bg);
+			text-decoration: none;
+		}
+
+		.client-error-action--primary,
+		.client-error-action--primary:visited {
+			border-color: transparent;
+			background: var(--bg-accent-01);
+			color: #fff;
+		}
+
+		.client-error-action--primary:hover,
+		.client-error-action--primary:focus {
+			background: var(--bg-accent-02);
+			color: #fff;
+		}
+
+		@media (max-width: 640px) {
+			.client-error-main {
+				padding: calc(68px + 24px) 16px 24px;
+			}
+
+			.client-error-card {
+				padding: 24px;
+				border-radius: 24px;
+			}
+
+			.client-error-panel {
+				padding: 20px;
+				border-radius: 18px;
+			}
+
+			.client-error-logo {
+				width: 132px;
+			}
+
+			.client-error-panel-head {
+				align-items: flex-start;
+				flex-wrap: wrap;
+			}
+
+			.client-error-actions {
+				flex-direction: column;
+			}
+
+			.client-error-action {
+				width: 100%;
+			}
+		}
+
+block content
+	- var statusPageHref = settings.statusPageUrl || '/site-status'
+	- var statusPageIsExternal = /^https?:\/\//.test(statusPageHref)
+	- var sessionUser = typeof getSessionUser === 'function' ? getSessionUser() : null
+	- var primaryHref = sessionUser ? '/project' : '/'
+	- var primaryLabel = sessionUser ? 'Open projects' : 'Go home'
+	main#main-content.content.content-alt.sessions-page.client-error-main
+		.client-error-shell
+			section.client-error-card(aria-labelledby='client-error-title')
+				.client-error-content
+					.client-error-brand-lockup
+						img.client-error-logo.client-error-logo--dark(
+							src=buildImgPath('ol-brand/overleaf-white.svg')
+							alt=settings.appName
+						)
+						img.client-error-logo.client-error-logo--light(
+							src=buildImgPath('ol-brand/overleaf-green.svg')
+							alt=settings.appName
+						)
+						p.client-error-eyebrow Error page
+					span.client-error-pill 400 Error
+					.client-error-title-block
+						h1#client-error-title.client-error-title Something went wrong with this request
+						p.client-error-summary
+							| We couldn&apos;t complete what you asked for. The request may be incomplete, malformed, or no longer valid.
+					section.client-error-panel(aria-labelledby='client-error-next-step-title')
+						.client-error-panel-head
+							h2#client-error-next-step-title.client-error-panel-title What you can do now
+							span.client-error-panel-meta Next step
+						p.client-error-copy
+							| Try returning to a known page, then repeat the action with a fresh link or updated form data.
 						if message
-							p.error-box
-								| #{message}
-						p.error-description
-							| Please go back and try again.
-							| If the problem persists, please contact us at
-							|
-							a(href='mailto:' + settings.adminEmail target='_blank') #{settings.adminEmail}
-							| .
-						p.error-actions
-							a.btn.btn-primary(href='/') Home
+							.client-error-message
+								+notification({
+									ariaLive: 'polite',
+									type: 'warning',
+									title: 'Request details',
+									content: '',
+								})
+									p= message
+						.client-error-actions
+							a.client-error-action.client-error-action--primary(href=primaryHref)= primaryLabel
+							a.client-error-action(
+								href=statusPageHref
+								target=statusPageIsExternal ? '_blank' : undefined
+								rel=statusPageIsExternal ? 'noreferrer' : undefined
+							) View status page
+					section.client-error-panel(aria-labelledby='client-error-help-title')
+						.client-error-panel-head
+							h2#client-error-help-title.client-error-panel-title Need help?
+						if settings.adminEmail
+							p.client-error-copy
+								| If the request should work, contact
+								= ' '
+								a.client-error-link(href='mailto:' + settings.adminEmail) the support team
+								|  and include what you were trying to do.
+						else
+							p.client-error-copy
+								| If the request should work, check
+								= ' '
+								a.client-error-link(
+									href=statusPageHref
+									target=statusPageIsExternal ? '_blank' : undefined
+									rel=statusPageIsExternal ? 'noreferrer' : undefined
+								) the status page
+								|  or return to a known page and try again.

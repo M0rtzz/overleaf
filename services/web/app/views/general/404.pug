@@ -1,11 +1,320 @@
 extends ../layout-marketing
 
+block vars
+	- showThinFooter = true
+	- forceLightMarketingNavbar = true
+	- additionalBodyClasses = [...new Set([...(Array.isArray(additionalBodyClasses) ? additionalBodyClasses : []), 'not-found-page'])]
+
+append css
+	style.
+		.not-found-main {
+			--not-found-page-bg: var(--bg-secondary-themed);
+			--not-found-page-bg-alt: var(--bg-primary-themed);
+			--not-found-panel: var(--bg-primary-themed);
+			--not-found-panel-alt: var(--bg-secondary-themed);
+			--not-found-border: var(--border-divider-themed);
+			--not-found-text: var(--content-primary-themed);
+			--not-found-muted: var(--content-secondary-themed);
+			--not-found-shadow: 0 18px 42px rgba(27, 34, 44, 0.1);
+			--not-found-pill-bg: #f5e4e4;
+			--not-found-pill-text: var(--content-danger-themed);
+			--not-found-link: #098842;
+			min-height: calc(100dvh - 50px);
+			padding: calc(68px + 32px) 24px 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--not-found-page-bg);
+			color: var(--not-found-text);
+			box-sizing: border-box;
+		}
+
+		.not-found-shell {
+			width: min(100%, 860px);
+		}
+
+		.not-found-card {
+			position: relative;
+			overflow: hidden;
+			padding: 36px;
+			border-radius: 28px;
+			border: 1px solid var(--not-found-border);
+			background: var(--not-found-panel);
+			box-shadow: var(--not-found-shadow);
+		}
+
+		.not-found-card::after {
+			content: '';
+			position: absolute;
+			top: -88px;
+			right: -72px;
+			width: 240px;
+			height: 240px;
+			border-radius: 50%;
+			background: rgba(0, 160, 84, 0.16);
+			pointer-events: none;
+		}
+
+		.not-found-content {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			gap: 24px;
+		}
+
+		.not-found-brand-lockup {
+			display: inline-flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.not-found-brand-lockup .not-found-eyebrow {
+			text-align: center;
+		}
+
+		.not-found-logo {
+			width: 152px;
+			height: 44px;
+			object-fit: contain;
+		}
+
+		.not-found-logo--light {
+			display: none;
+		}
+
+		body[data-theme='light'] .not-found-logo--dark {
+			display: none;
+		}
+
+		body[data-theme='light'] .not-found-logo--light {
+			display: inline-block;
+		}
+
+		.not-found-eyebrow {
+			margin: 0;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--not-found-muted);
+		}
+
+		.not-found-pill,
+		.not-found-panel-meta {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 8px 14px;
+			border-radius: 999px;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.not-found-pill {
+			justify-self: center;
+			background: var(--not-found-pill-bg);
+			color: var(--not-found-pill-text);
+		}
+
+		.not-found-title-block {
+			display: grid;
+			gap: 12px;
+			text-align: center;
+		}
+
+		.not-found-title {
+			margin: 0;
+			font-size: clamp(34px, 5vw, 54px);
+			line-height: 1.12;
+			color: var(--not-found-text);
+		}
+
+		.not-found-summary {
+			max-width: 640px;
+			margin: 0 auto;
+			font-size: 18px;
+			line-height: 1.7;
+			color: var(--not-found-muted);
+		}
+
+		.not-found-panel {
+			padding: 24px 28px;
+			border-radius: 22px;
+			border: 1px solid var(--not-found-border);
+			background: var(--not-found-panel-alt);
+		}
+
+		.not-found-panel-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 12px;
+		}
+
+		.not-found-panel-title {
+			margin: 0;
+			font-size: 21px;
+			color: var(--not-found-text);
+		}
+
+		.not-found-panel-meta {
+			background: #d6f1e2;
+			color: #098842;
+			padding: 6px 10px;
+			font-size: 12px;
+		}
+
+		.not-found-copy {
+			margin: 0;
+			font-size: 16px;
+			line-height: 1.7;
+			color: var(--not-found-muted);
+		}
+
+		.not-found-link,
+		.not-found-link:visited,
+		.not-found-link:hover,
+		.not-found-link:focus {
+			color: var(--not-found-link);
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 3px;
+		}
+
+		.not-found-actions {
+			margin-top: 18px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+
+		.not-found-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: 0 16px;
+			border-radius: 999px;
+			border: 1px solid var(--not-found-border);
+			background: var(--not-found-panel);
+			color: var(--not-found-text);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+
+		.not-found-action:visited,
+		.not-found-action:hover,
+		.not-found-action:focus {
+			color: var(--not-found-text);
+			background: var(--not-found-page-bg);
+			text-decoration: none;
+		}
+
+		.not-found-action--primary,
+		.not-found-action--primary:visited {
+			border-color: transparent;
+			background: var(--bg-accent-01);
+			color: #fff;
+		}
+
+		.not-found-action--primary:hover,
+		.not-found-action--primary:focus {
+			background: var(--bg-accent-02);
+			color: #fff;
+		}
+
+		@media (max-width: 640px) {
+			.not-found-main {
+				padding: calc(68px + 24px) 16px 24px;
+			}
+
+			.not-found-card {
+				padding: 24px;
+				border-radius: 24px;
+			}
+
+			.not-found-panel {
+				padding: 20px;
+				border-radius: 18px;
+			}
+
+			.not-found-logo {
+				width: 132px;
+			}
+
+			.not-found-panel-head {
+				align-items: flex-start;
+				flex-wrap: wrap;
+			}
+
+			.not-found-actions {
+				flex-direction: column;
+			}
+
+			.not-found-action {
+				width: 100%;
+			}
+		}
+
 block content
-	main#main-content.content.content-alt
-		.container
-			.error-container
-				.error-details
-					h1.error-status #{translate("not_found")}
-					p.error-description #{translate("cant_find_page")}
-					p.error-actions
-						a.error-btn(href='/') Home
+	- var statusPageHref = settings.statusPageUrl || '/site-status'
+	- var statusPageIsExternal = /^https?:\/\//.test(statusPageHref)
+	main#main-content.content.content-alt.sessions-page.not-found-main
+		.not-found-shell
+			section.not-found-card(aria-labelledby='not-found-title')
+				.not-found-content
+					.not-found-brand-lockup
+						img.not-found-logo.not-found-logo--dark(
+							src=buildImgPath('ol-brand/overleaf-white.svg')
+							alt=settings.appName
+						)
+						img.not-found-logo.not-found-logo--light(
+							src=buildImgPath('ol-brand/overleaf-green.svg')
+							alt=settings.appName
+						)
+						p.not-found-eyebrow Error page
+					span.not-found-pill 404 Error
+					.not-found-title-block
+						h1#not-found-title.not-found-title #{translate("not_found")}
+						p.not-found-summary
+							| #{translate("cant_find_page")}
+							|  The address may be outdated, moved, or only available from a different route.
+					section.not-found-panel(aria-labelledby='not-found-next-step-title')
+						.not-found-panel-head
+							h2#not-found-next-step-title.not-found-panel-title What you can do now
+							span.not-found-panel-meta Next step
+						p.not-found-copy
+							| Try heading back to a known page, open your project dashboard, or check service status if you expected this link to work.
+						.not-found-actions
+							a.not-found-action.not-found-action--primary(href='/') Go home
+							a.not-found-action(
+								href=statusPageHref
+								target=statusPageIsExternal ? '_blank' : undefined
+								rel=statusPageIsExternal ? 'noreferrer' : undefined
+							) View status page
+					section.not-found-panel(aria-labelledby='not-found-help-title')
+						.not-found-panel-head
+							h2#not-found-help-title.not-found-panel-title Need help?
+						if settings.adminEmail
+							p.not-found-copy
+								| If this page should exist, contact
+								= ' '
+								a.not-found-link(href='mailto:' + settings.adminEmail) the support team
+								|  and include the link you tried to open.
+						else
+							p.not-found-copy
+								| If this page should exist, check
+								= ' '
+								a.not-found-link(
+									href=statusPageHref
+									target=statusPageIsExternal ? '_blank' : undefined
+									rel=statusPageIsExternal ? 'noreferrer' : undefined
+								) the status page
+								|  or return to a known page and try again.

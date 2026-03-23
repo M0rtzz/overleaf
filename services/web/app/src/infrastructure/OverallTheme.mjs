@@ -13,4 +13,21 @@ function getOverallThemeFromRequestCookie(req) {
   return normalizeOverallTheme(overallThemeCookie)
 }
 
-export { getOverallThemeFromRequestCookie, normalizeOverallTheme }
+function getThemeRenderOptions(req, sessionUser) {
+  if (!sessionUser) {
+    return {
+      overallThemeOverride: getOverallThemeFromRequestCookie(req),
+    }
+  }
+
+  return {
+    overallThemeOverride: normalizeOverallTheme(sessionUser.ace?.overallTheme),
+    ignoreOverallThemeCookie: true,
+  }
+}
+
+export {
+  getOverallThemeFromRequestCookie,
+  getThemeRenderOptions,
+  normalizeOverallTheme,
+}
