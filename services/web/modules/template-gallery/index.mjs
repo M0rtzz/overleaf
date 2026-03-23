@@ -17,7 +17,12 @@ if (process.env.OVERLEAF_TEMPLATE_GALLERY === 'true') {
   TemplateGalleryModule = {
     router: Router,
   }
-  Settings.nav.header_extras.push({text: "templates", url: "/templates", class: "subdued"})
+  Settings.nav.header_extras.push({
+    text: "templates",
+    url: "/templates",
+    class: "subdued",
+    only_when_logged_in: true,
+  })
   
   Settings.templates = {
     nonAdminCanManage: boolFromEnv(process.env.OVERLEAF_NON_ADMIN_CAN_PUBLISH_TEMPLATES),

@@ -10,13 +10,13 @@ block css
 			--status-text: var(--content-primary-themed);
 			--status-muted: var(--content-secondary-themed);
 			--status-shadow: 0 12px 30px rgba(27, 34, 44, 0.08);
-			--status-operational-bg: var(--bg-accent-03);
+			--status-operational-bg: #d6f1e2;
 			--status-operational-text: var(--content-positive-themed);
 			--status-degraded-bg: var(--bg-warning-03);
 			--status-degraded-text: var(--content-warning-themed);
 			--status-maintenance-bg: var(--bg-danger-03);
 			--status-maintenance-text: var(--content-danger-themed);
-			--status-info-bg: var(--bg-accent-03);
+			--status-info-bg: #d6f1e2;
 			--status-info-text: var(--content-positive-themed);
 			--status-accent: var(--bg-accent-01);
 			--status-accent-hover: var(--bg-accent-02);
@@ -67,7 +67,7 @@ block css
 
 		body.site-status-page .site-status-topbar {
 			display: flex;
-			align-items: center;
+			align-items: flex-start;
 			justify-content: space-between;
 			gap: 16px;
 			margin-bottom: 18px;
@@ -75,8 +75,13 @@ block css
 
 		body.site-status-page .site-status-brand-lockup {
 			display: inline-flex;
+			flex-direction: column;
 			align-items: center;
-			gap: 14px;
+			gap: 8px;
+		}
+
+		body.site-status-page .site-status-brand-lockup .site-status-eyebrow {
+			text-align: center;
 		}
 
 		body.site-status-page .site-status-logo {
@@ -146,7 +151,7 @@ block css
 		}
 
 		body.site-status-page .site-status-eyebrow {
-			margin: 0 0 12px;
+			margin: 0;
 			font-size: 13px;
 			font-weight: 700;
 			letter-spacing: 0.12em;
@@ -157,7 +162,7 @@ block css
 		body.site-status-page .site-status-title {
 			margin: 0 0 12px;
 			font-size: clamp(34px, 5vw, 52px);
-			line-height: 1;
+			line-height: 1.2;
 			color: var(--status-text);
 		}
 
@@ -195,7 +200,8 @@ block css
 		}
 
 		body.site-status-page[data-theme='default'] .site-status-pill--operational,
-		body.site-status-page[data-theme='default'] .site-status-service-badge--operational {
+		body.site-status-page[data-theme='default'] .site-status-service-badge--operational,
+		body.site-status-page[data-theme='default'] .site-status-notice-meta--info {
 			color: var(--status-operational-dark-text);
 		}
 
@@ -239,21 +245,17 @@ block css
 
 		body.site-status-page .site-status-card-title,
 		body.site-status-page .site-status-section-title,
-		body.site-status-page .site-status-notice-title,
 		body.site-status-page .site-status-message-title {
+			margin: 0;
+			color: var(--status-text);
+			font-size: 21px;
+		}
+
+		body.site-status-page .site-status-notice-title {
 			margin: 0;
 			color: var(--status-text);
 		}
 
-		body.site-status-page .site-status-card-title {
-			font-size: 21px;
-		}
-
-		body.site-status-page .site-status-section-title {
-			font-size: 20px;
-		}
-
-		body.site-status-page .site-status-message-title,
 		body.site-status-page .site-status-notice-title {
 			font-size: 16px;
 		}
@@ -269,9 +271,25 @@ block css
 			line-height: 1.7;
 		}
 
+		body.site-status-page .site-status-card-description,
+		body.site-status-page .site-status-message p,
+		body.site-status-page .site-status-notice p,
+		body.site-status-page .site-status-html-message,
+		body.site-status-page .site-status-html-message p {
+			font-size: 16px;
+		}
+
+		body.site-status-page .site-status-card-description {
+			margin: 0;
+		}
+
 		body.site-status-page .site-status-section-meta,
 		body.site-status-page .site-status-empty {
 			font-size: 14px;
+		}
+
+		body.site-status-page .site-status-empty {
+			margin: 0;
 		}
 
 		body.site-status-page .site-status-html-message > :first-child {
@@ -299,15 +317,38 @@ block css
 			border: 1px solid var(--status-border);
 		}
 
+		body.site-status-page .site-status-notice-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-bottom: 12px;
+		}
+
+		body.site-status-page .site-status-message-title {
+			margin-bottom: 12px;
+		}
+
 		body.site-status-page .site-status-links {
-			margin-top: 16px;
+			margin-top: 8px;
 			display: flex;
 			flex-wrap: wrap;
 			gap: 12px 18px;
 		}
 
-		body.site-status-page .site-status-link {
-			color: var(--status-text);
+		body.site-status-page .site-status-message > p {
+			margin: 0;
+		}
+
+		body.site-status-page .site-status-link,
+		body.site-status-page .site-status-link:visited,
+		body.site-status-page .site-status-link:hover,
+		body.site-status-page .site-status-link:focus,
+		body.site-status-page .site-status-html-message a,
+		body.site-status-page .site-status-html-message a:visited,
+		body.site-status-page .site-status-html-message a:hover,
+		body.site-status-page .site-status-html-message a:focus {
+			color: #098842;
 			text-decoration: underline;
 			text-decoration-thickness: 1px;
 			text-underline-offset: 3px;
@@ -356,6 +397,11 @@ block css
 			body.site-status-page .site-status-message {
 				padding: 20px;
 			}
+
+			body.site-status-page .site-status-notice-head {
+				align-items: flex-start;
+				flex-wrap: wrap;
+			}
 		}
 
 block content
@@ -372,11 +418,11 @@ block content
 							src=buildImgPath('ol-brand/overleaf-green.svg')
 							alt=settings.appName
 						)
+						p.site-status-eyebrow Website status
 					.site-status-actions
 						a.site-status-action.site-status-action--primary(
 							href='mailto:' + siteStatus.adminEmail
 						) Contact support
-				p.site-status-eyebrow Website status
 				span.site-status-pill(class={
 					'site-status-pill--operational': siteStatus.overallStatus.tone === 'operational',
 					'site-status-pill--degraded': siteStatus.overallStatus.tone === 'degraded',
@@ -400,17 +446,18 @@ block content
 			section.site-status-notices
 				.site-status-section-head
 					h2.site-status-section-title Current notices
-					span.site-status-section-meta Live information from maintenance settings and system messages.
+					span.site-status-section-meta Live information from health checks, maintenance notices, and system messages.
 				if siteStatus.announcements.length
 					.site-status-notices-list
 						each announcement in siteStatus.announcements
 							article.site-status-notice
-								h3.site-status-notice-title= announcement.title
-								span.site-status-notice-meta(class={
-									'site-status-notice-meta--degraded': announcement.tone === 'degraded',
-									'site-status-notice-meta--maintenance': announcement.tone === 'maintenance',
-									'site-status-notice-meta--info': announcement.tone === 'info' || announcement.tone === 'operational',
-								})= announcement.tone === 'info' ? 'Notice' : siteStatus.overallStatus.label
+								.site-status-notice-head
+									h3.site-status-notice-title= announcement.title
+									span.site-status-notice-meta(class={
+										'site-status-notice-meta--degraded': announcement.tone === 'degraded',
+										'site-status-notice-meta--maintenance': announcement.tone === 'maintenance',
+										'site-status-notice-meta--info': announcement.tone === 'info' || announcement.tone === 'operational',
+									})= announcement.metaLabel
 								if announcement.isHtml
 									.site-status-html-message !{announcement.content}
 								else
@@ -420,10 +467,13 @@ block content
 
 			section.site-status-message
 				h2.site-status-message-title Need help?
-				p Contact the support team if you need help restoring access or confirming whether maintenance is still active.
-				.site-status-links
-					a.site-status-link(href='mailto:' + siteStatus.adminEmail) Contact support
-					if siteStatus.statusPageUrl
+				p
+					| Contact
+					= ' '
+					a.site-status-link(href='mailto:' + siteStatus.adminEmail) the support team
+					|  if you need help restoring access or confirming whether maintenance is still active.
+				if siteStatus.statusPageUrl
+					.site-status-links
 						a.site-status-link(
 							href=siteStatus.statusPageUrl
 							target='_blank'

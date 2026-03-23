@@ -1,6 +1,7 @@
 import logger from '@overleaf/logger'
 import Settings from '@overleaf/settings'
 import { plainTextResponse } from '../../infrastructure/Response.mjs'
+import { getOverallThemeFromRequestCookie } from '../../infrastructure/OverallTheme.mjs'
 
 function renderJSONError(res, message, info = {}) {
   if (info.message) {
@@ -154,7 +155,11 @@ export default HttpErrorHandler = {
     }
     switch (req.accepts(['html', 'json'])) {
       case 'html':
-        return res.render('general/closed', { title: 'maintenance' })
+        return res.render('general/closed', {
+          title: 'maintenance',
+          bodyClasses: ['sessions-page'],
+          overallThemeOverride: getOverallThemeFromRequestCookie(req),
+        })
       case 'json':
         return renderJSONError(res, message, {})
       default:

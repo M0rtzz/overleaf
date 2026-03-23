@@ -201,6 +201,33 @@ describe('HttpErrorHandler', function () {
     })
   })
 
+  describe('maintenance', function () {
+    it("renders maintenance HTML using the current device's theme cookie", function (ctx) {
+      ctx.req.accepts = () => 'html'
+      ctx.req.cookies = { 'ol-overallTheme': 'light-' }
+
+      ctx.HttpErrorHandler.maintenance(ctx.req, ctx.res)
+
+      expect(ctx.res.renderedTemplate).to.equal('general/closed')
+      expect(ctx.res.renderedVariables).to.deep.equal({
+        title: 'maintenance',
+        overallThemeOverride: 'light-',
+      })
+    })
+
+    it('falls back to system theme when no theme cookie is present', function (ctx) {
+      ctx.req.accepts = () => 'html'
+
+      ctx.HttpErrorHandler.maintenance(ctx.req, ctx.res)
+
+      expect(ctx.res.renderedTemplate).to.equal('general/closed')
+      expect(ctx.res.renderedVariables).to.deep.equal({
+        title: 'maintenance',
+        overallThemeOverride: 'system',
+      })
+    })
+  })
+
   describe('notFound', function () {
     it('returns 404', function (ctx) {
       ctx.HttpErrorHandler.notFound(ctx.req, ctx.res)

@@ -15,6 +15,7 @@ import UserUpdater from './UserUpdater.mjs'
 import Errors from '../Errors/Errors.js'
 import HttpErrorHandler from '../Errors/HttpErrorHandler.mjs'
 import OError from '@overleaf/o-error'
+import Settings from '@overleaf/settings'
 import EmailHandler from '../Email/EmailHandler.mjs'
 import UrlHelper from '../Helpers/UrlHelper.mjs'
 import { promisify } from 'node:util'
@@ -342,8 +343,11 @@ const updateUserSettingsSchema = z.object({
 function setOverallThemeCookie(res, overallTheme = 'system') {
   const overallThemeCookieValue = overallTheme === '' ? 'dark' : overallTheme
   res.cookie('ol-overallTheme', overallThemeCookieValue, {
+    domain: Settings.cookieDomain,
     maxAge: 365 * 24 * 60 * 60 * 1000,
-    sameSite: 'lax',
+    path: '/',
+    sameSite: Settings.sameSiteCookie || 'lax',
+    secure: Settings.secureCookie,
   })
 }
 
