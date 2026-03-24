@@ -12,6 +12,10 @@ append css
 			--server-error-panel: var(--bg-primary-themed);
 			--server-error-panel-alt: var(--bg-secondary-themed);
 			--server-error-border: var(--border-divider-themed);
+			--server-error-action-bg: rgba(255, 255, 255, 0.08);
+			--server-error-action-bg-hover: rgba(255, 255, 255, 0.14);
+			--server-error-action-border: rgba(255, 255, 255, 0.22);
+			--server-error-action-shadow: 0 10px 24px rgba(8, 15, 30, 0.16);
 			--server-error-text: var(--content-primary-themed);
 			--server-error-muted: var(--content-secondary-themed);
 			--server-error-shadow: 0 18px 42px rgba(27, 34, 44, 0.1);
@@ -26,6 +30,13 @@ append css
 			background: var(--server-error-page-bg);
 			color: var(--server-error-text);
 			box-sizing: border-box;
+		}
+
+		body[data-theme='light'] .server-error-main {
+			--server-error-action-bg: #fff;
+			--server-error-action-bg-hover: #f5f7fa;
+			--server-error-action-border: rgba(27, 34, 44, 0.14);
+			--server-error-action-shadow: 0 8px 20px rgba(27, 34, 44, 0.08);
 		}
 
 		.server-error-shell {
@@ -198,21 +209,26 @@ append css
 			min-height: 42px;
 			padding: 0 16px;
 			border-radius: 999px;
-			border: 1px solid var(--server-error-border);
-			background: var(--server-error-panel);
+			border: 1px solid var(--server-error-action-border);
+			background: var(--server-error-action-bg);
+			box-shadow: var(--server-error-action-shadow);
 			color: var(--server-error-text);
 			font-size: 13px;
 			font-weight: 700;
 			letter-spacing: 0.04em;
 			text-decoration: none;
 			text-transform: uppercase;
+			transition: background-color 0.2s ease, border-color 0.2s ease,
+				box-shadow 0.2s ease;
 		}
 
 		.server-error-action:visited,
 		.server-error-action:hover,
 		.server-error-action:focus {
 			color: var(--server-error-text);
-			background: var(--server-error-page-bg);
+			border-color: #098842;
+			background: var(--server-error-action-bg-hover);
+			box-shadow: 0 0 0 3px rgba(9, 136, 66, 0.16);
 			text-decoration: none;
 		}
 

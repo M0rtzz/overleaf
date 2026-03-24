@@ -123,16 +123,21 @@ block css
 			letter-spacing: 0.04em;
 			text-decoration: none;
 			text-transform: uppercase;
+			transition: background-color 0.2s ease, border-color 0.2s ease,
+				box-shadow 0.2s ease;
 		}
 
-		body.site-status-page .site-status-action--primary {
+		body.site-status-page .site-status-action--primary,
+		body.site-status-page .site-status-action--primary:visited {
 			background: var(--status-accent);
 			border-color: transparent;
 			color: #fff;
 		}
 
-		body.site-status-page .site-status-action--primary:hover {
+		body.site-status-page .site-status-action--primary:hover,
+		body.site-status-page .site-status-action--primary:focus {
 			background: var(--status-accent-hover);
+			box-shadow: 0 0 0 3px rgba(9, 136, 66, 0.16);
 			color: #fff;
 		}
 

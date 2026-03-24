@@ -13,6 +13,10 @@ append css
 			--not-found-panel: var(--bg-primary-themed);
 			--not-found-panel-alt: var(--bg-secondary-themed);
 			--not-found-border: var(--border-divider-themed);
+			--not-found-action-bg: rgba(255, 255, 255, 0.08);
+			--not-found-action-bg-hover: rgba(255, 255, 255, 0.14);
+			--not-found-action-border: rgba(255, 255, 255, 0.22);
+			--not-found-action-shadow: 0 10px 24px rgba(8, 15, 30, 0.16);
 			--not-found-text: var(--content-primary-themed);
 			--not-found-muted: var(--content-secondary-themed);
 			--not-found-shadow: 0 18px 42px rgba(27, 34, 44, 0.1);
@@ -27,6 +31,13 @@ append css
 			background: var(--not-found-page-bg);
 			color: var(--not-found-text);
 			box-sizing: border-box;
+		}
+
+		body[data-theme='light'] .not-found-main {
+			--not-found-action-bg: #fff;
+			--not-found-action-bg-hover: #f5f7fa;
+			--not-found-action-border: rgba(27, 34, 44, 0.14);
+			--not-found-action-shadow: 0 8px 20px rgba(27, 34, 44, 0.08);
 		}
 
 		.not-found-shell {
@@ -199,21 +210,26 @@ append css
 			min-height: 42px;
 			padding: 0 16px;
 			border-radius: 999px;
-			border: 1px solid var(--not-found-border);
-			background: var(--not-found-panel);
+			border: 1px solid var(--not-found-action-border);
+			background: var(--not-found-action-bg);
+			box-shadow: var(--not-found-action-shadow);
 			color: var(--not-found-text);
 			font-size: 13px;
 			font-weight: 700;
 			letter-spacing: 0.04em;
 			text-decoration: none;
 			text-transform: uppercase;
+			transition: background-color 0.2s ease, border-color 0.2s ease,
+				box-shadow 0.2s ease;
 		}
 
 		.not-found-action:visited,
 		.not-found-action:hover,
 		.not-found-action:focus {
 			color: var(--not-found-text);
-			background: var(--not-found-page-bg);
+			border-color: #098842;
+			background: var(--not-found-action-bg-hover);
+			box-shadow: 0 0 0 3px rgba(9, 136, 66, 0.16);
 			text-decoration: none;
 		}
 
