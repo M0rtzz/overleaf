@@ -39,6 +39,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
     return {
       name,
       description,
+      monitorLabel: 'Monitored by smoke tests',
       state: 'shutting-down',
       tone: 'maintenance',
       label: 'Shutting down',
@@ -49,6 +50,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
     return {
       name,
       description,
+      monitorLabel: 'Monitored by smoke tests',
       state: 'maintenance',
       tone: 'maintenance',
       label: 'Maintenance',
@@ -59,6 +61,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
     return {
       name,
       description,
+      monitorLabel: 'Monitored by smoke tests',
       state: 'maintenance',
       tone: 'maintenance',
       label: 'Maintenance',
@@ -70,6 +73,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
       return {
         name,
         description,
+        monitorLabel: 'Monitored by smoke tests',
         state: 'operational',
         tone: 'operational',
         label: 'Operational',
@@ -78,6 +82,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
       return {
         name,
         description,
+        monitorLabel: 'Monitored by smoke tests',
         state: 'unavailable',
         tone: 'degraded',
         label: 'Unavailable',
@@ -86,6 +91,7 @@ function getServiceStatus(serviceKey, name, description, healthSnapshot) {
       return {
         name,
         description,
+        monitorLabel: 'Monitored by smoke tests',
         state: 'unknown',
         tone: 'degraded',
         label: 'Unavailable',

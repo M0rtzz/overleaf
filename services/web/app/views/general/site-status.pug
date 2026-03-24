@@ -1,4 +1,5 @@
 extends ../layout-marketing
+include ../_mixins/material_symbol
 
 block css
 	style.
@@ -288,6 +289,25 @@ block css
 			margin: 0;
 		}
 
+		body.site-status-page .site-status-card-meta {
+			margin: 10px 0 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			font-size: 13px;
+			font-weight: 600;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			color: var(--status-muted);
+		}
+
+		body.site-status-page .site-status-card-meta-icon {
+			font-size: 18px;
+			line-height: 1;
+			flex-shrink: 0;
+		}
+
 		body.site-status-page .site-status-section-meta,
 		body.site-status-page .site-status-empty {
 			font-size: 14px;
@@ -447,6 +467,10 @@ block content
 								'site-status-service-badge--maintenance': service.tone === 'maintenance',
 							})= service.label
 						p.site-status-card-description= service.description
+						if service.monitorLabel
+							p.site-status-card-meta
+								+material-symbol-outlined('ecg_heart', 'site-status-card-meta-icon')
+								span= service.monitorLabel
 
 			section.site-status-notices
 				.site-status-section-head
