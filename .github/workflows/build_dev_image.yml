@@ -41,6 +41,7 @@ jobs:
             contacts,
             chat,
             clsi,
+            github-sync,
           ]
         platform: [linux/amd64, linux/arm64]
         include:
@@ -103,6 +104,7 @@ jobs:
             contacts,
             chat,
             clsi,
+            github-sync,
           ]
 
     steps:
