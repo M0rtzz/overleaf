@@ -12,6 +12,22 @@ import ProjectGetter from '../../../../app/src/Features/Project/ProjectGetter.mj
 import { fetchJson } from '@overleaf/fetch-utils'
 import UserGetter from '../../../../app/src/Features/User/UserGetter.mjs'
 
+function isValidGitHubRepoName(name) {
+  if (typeof name !== 'string') {
+    return false
+  }
+
+  const trimmed = name.trim()
+
+  return (
+    trimmed.length > 0 &&
+    trimmed.length <= 100 &&
+    /^[A-Za-z0-9._-]+$/.test(trimmed) &&
+    !trimmed.startsWith('.') &&
+    !trimmed.endsWith('.') &&
+    !trimmed.endsWith('.git')
+  )
+}
 
 /**
  * Get user's GitHub connection status
@@ -50,7 +66,7 @@ async function getProjectStatus(req, res) {
   const { Project_id: projectId } = req.params
 
   const status = await GitHubSyncHandler.promises.getProjectGitHubSyncStatus(projectId)
-  
+
   if (status && status.enabled) {
     const ownerId = status.ownerId
     const owner = await UserGetter.promises.getUser(ownerId, {
@@ -69,6 +85,66 @@ async function getProjectStatus(req, res) {
         enabled: false
       }
       )
+    }
+
+    if (status.repo) {
+      try {
+        const repoInfo = await GitHubSyncHandler.promises.getRepoInfo(
+          ownerId,
+          status.repo
+        )
+
+        const updateFields = {}
+
+        if (repoInfo.fullName && repoInfo.fullName !== status.repo) {
+          updateFields.repo = repoInfo.fullName
+          status.repo = repoInfo.fullName
+        }
+
+        if (
+          repoInfo.defaultBranch &&
+          repoInfo.defaultBranch !== status.default_branch
+        ) {
+          updateFields.default_branch = repoInfo.defaultBranch
+          status.default_branch = repoInfo.defaultBranch
+        }
+
+        if (Object.keys(updateFields).length > 0) {
+          await GitHubSyncHandler.promises.updateProjectGitHubSyncStatus(
+            projectId,
+            updateFields
+          )
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+
+        if (message.includes('Repository not found or access denied')) {
+          await GitHubSyncHandler.promises.deleteProjectGitHubSyncStatus(
+            projectId
+          )
+
+          return res.json({
+            enabled: false,
+          })
+        }
+
+        logger.warn(
+          {
+            projectId,
+            ownerId,
+            repo: status.repo,
+            err: error instanceof Error ? error : new Error(String(error)),
+          },
+          'Failed to refresh GitHub repo metadata for project status'
+        )
+      }
+    }
+
+    if (status.repo) {
+      const [repoOwner, repoName] = status.repo.split('/')
+      status.repoOwner = repoOwner
+      status.repoName = repoName
+      status.branch = status.default_branch
     }
 
     // remove status. last_sync_sha and .last_sync_version
@@ -213,10 +289,18 @@ async function exportProject(req, res){
   const userId = SessionManager.getLoggedInUserId(req.session)
   const { Project_id: projectId } = req.params
   const { name, description, private: isPrivate, org } = req.body
+  const normalizedName = typeof name === 'string' ? name.trim() : name
 
-  logger.debug({ userId, projectId, name, isPrivate, org }, 'Received request to export project to GitHub')
-  if (!name || isPrivate === undefined || !projectId) {
+  logger.debug({ userId, projectId, name: normalizedName, isPrivate, org }, 'Received request to export project to GitHub')
+  if (!normalizedName || isPrivate === undefined || !projectId) {
     return res.status(400).json({ error: 'Name, private and projectId are required' })
+  }
+
+  if (!isValidGitHubRepoName(normalizedName)) {
+    return res.status(400).json({
+      message:
+        'Invalid GitHub repository name. It must be 1-100 characters long and use only letters, numbers, periods (.), underscores (_), or hyphens (-). Do not include spaces or end with ".git".',
+    })
   }
 
 
@@ -224,15 +308,19 @@ async function exportProject(req, res){
     const repoResult = await GitHubSyncHandler.promises.exportProjectToGitHub(
       userId,
       projectId,
-      name,
+      normalizedName,
       description,
       isPrivate,
       org
     )
     res.json(repoResult)
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Error exporting project to GitHub')
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' })
+    const status = message.includes('GitHub repository name already exists.')
+      ? 400
+      : 500
+    res.status(status).json({ message })
   }
 }
 

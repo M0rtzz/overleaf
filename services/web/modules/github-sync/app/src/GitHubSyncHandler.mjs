@@ -289,6 +289,7 @@ export default {
   promises: {
     getUserGitHubStatus,
     getProjectGitHubSyncStatus,
+    updateProjectGitHubSyncStatus,
     listUserRepos,
     getProjectSyncStatus,
     exchangeCodeForToken,

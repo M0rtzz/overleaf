@@ -68,6 +68,19 @@ async function createRepositoryOnGitHub(userId, repoName, repoDescription, isPri
   if (!response.ok) {
     const errorData = await response.json()
     logger.error('Failed to create GitHub repository', { userId, repoName, error: errorData })
+    const nameAlreadyExists = response.status === 422 &&
+      Array.isArray(errorData.errors) &&
+      errorData.errors.some(
+        error =>
+          error?.field === 'name' &&
+          typeof error?.message === 'string' &&
+          error.message.toLowerCase().includes('already exists')
+      )
+
+    if (nameAlreadyExists) {
+      throw new Error('GitHub repository name already exists.')
+    }
+
     throw new Error(`Repository creation failed.`)
   }
 
@@ -353,14 +366,14 @@ async function initializeRepositoryForProject(projectId, userId, repoFullName, d
     // of the repo to point to the new commit.
     const treeSha = await createTreeOnGitHub(
       repoFullName, blobShas, accessToken, null)
-    
+
     const commitSha = await createCommitOnGitHub(
-      repoFullName, treeSha, `Initial Overleaf Import`, accessToken)
+      repoFullName, treeSha, `🎉 init: initial overleaf import`, accessToken)
 
     const updateRefResult = await updateBranchToCommit(
       repoFullName, defaultBranch, commitSha, accessToken, true)
 
-    logger.debug({ projectId, repoFullName, treeSha, commitSha, updateRefResult }, 
+    logger.debug({ projectId, repoFullName, treeSha, commitSha, updateRefResult },
       'Created initial commit on GitHub Successfully')
 
     // Finally, we need to save the GitHub sync status to the database,

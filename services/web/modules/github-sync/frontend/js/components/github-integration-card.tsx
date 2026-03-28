@@ -1,6 +1,6 @@
 
 import { useTranslation } from 'react-i18next'
-import { useState, useEffect } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import GithubLogo from '@/shared/svgs/github-logo'
 import { useProjectContext } from '@/shared/context/project-context'
 import IntegrationCard from '@/features/ide-redesign/components/integrations-panel/integration-card'
@@ -32,6 +32,19 @@ import { Trans } from 'react-i18next'
 
 
 type GitHubSyncModalStatus = 'loading' | 'export' | 'merge' | 'pushSubmit' | 'syncing' | 'conflict' | 'need-auth'
+
+function isValidGitHubRepoName(name: string) {
+  const trimmed = name.trim()
+
+  return (
+    trimmed.length > 0 &&
+    trimmed.length <= 100 &&
+    /^[A-Za-z0-9._-]+$/.test(trimmed) &&
+    !trimmed.startsWith('.') &&
+    !trimmed.endsWith('.') &&
+    !trimmed.endsWith('.git')
+  )
+}
 
 type GitHubSyncModalNeedAuthProps = {
   handleHide: () => void
@@ -178,7 +191,7 @@ const GithubSyncModalExporting = ({ handleHide, handleSetModalState }: GithubSyn
   const [description, setDescription] = useState('')
   const [visibility, setVisibility] = useState<'public' | 'private'>('private')
   const [submitLoading, setSubmitLoading] = useState(false)
-  const [isSubmitError, setIsSubmitError] = useState(false)
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<ReactNode>('')
   const { project } = useProjectContext()
 
   useEffect(() => {
@@ -202,6 +215,19 @@ const GithubSyncModalExporting = ({ handleHide, handleSetModalState }: GithubSyn
 
   const handlerSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setSubmitErrorMessage('')
+    const normalizedRepoName = repoName.trim()
+
+    if (!isValidGitHubRepoName(normalizedRepoName)) {
+      setSubmitErrorMessage(
+        t('github_repository_name_invalid', {
+          defaultValue:
+            'Invalid GitHub repository name. It must be 1-100 characters long and use only letters, numbers, periods (.), underscores (_), or hyphens (-). Do not include spaces or end with ".git".',
+        })
+      )
+      return
+    }
+
     setSubmitLoading(true)
     // Interface with backend
     // Endpoint: /project/<project_id>/github-sync/export
@@ -214,7 +240,7 @@ const GithubSyncModalExporting = ({ handleHide, handleSetModalState }: GithubSyn
       try {
         await postJSON(`/project/${project?._id}/github-sync/export`, {
           body: {
-            name: repoName,
+            name: normalizedRepoName,
             description,
             private: visibility === 'private',
             org: selectedOwner === user ? undefined : selectedOwner,
@@ -227,7 +253,29 @@ const GithubSyncModalExporting = ({ handleHide, handleSetModalState }: GithubSyn
       } catch (err: any) {
         console.error('Failed to export project to GitHub', err)
         setSubmitLoading(false)
-        setIsSubmitError(true)
+        const message = String(
+          err?.data?.message || err?.data?.error || err?.message || ''
+        )
+        if (message.includes('GitHub repository name already exists.')) {
+          const repoUrl = `https://github.com/${selectedOwner}/${normalizedRepoName}`
+          setSubmitErrorMessage(
+            <>
+              A GitHub repository with this name already exists in the selected
+              account or organization:{' '}
+              <a
+                href={repoUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="github-sync-modal-link"
+              >
+                {selectedOwner}/{normalizedRepoName}
+              </a>
+              .
+            </>
+          )
+        } else {
+          setSubmitErrorMessage(t('github_validation_check'))
+        }
       }
     }
 
@@ -240,10 +288,10 @@ const GithubSyncModalExporting = ({ handleHide, handleSetModalState }: GithubSyn
         <h4>{t('export_project_to_github')}</h4>
         <p>{t('project_not_linked_to_github')}</p>
         {
-          isSubmitError && (
+          submitErrorMessage && (
             <OLNotification
               type="error"
-              content={t('github_validation_check')}
+              content={submitErrorMessage}
             />
           )
         }
@@ -430,8 +478,13 @@ const GithubSyncModalMerging = ({
   return (
     <>
       <OLModalBody>
-        <p className="text-center">{t('project_linked_to')}:
-          <a href={`https://github.com/${projectSyncStatus.repo}`} target="_blank" rel="noopener noreferrer">
+        <p className="text-center">{`${t('project_linked_to')}: `}
+          <a
+            href={`https://github.com/${projectSyncStatus.repo}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="github-sync-modal-link"
+          >
             {projectSyncStatus.repo}
           </a>
         </p>

@@ -3,6 +3,22 @@ import GithubSyncHandler from './GitHubSyncHandler.js'
 import { expressify } from '@overleaf/promise-utils'
 import logger from '@overleaf/logger'
 
+function isValidGitHubRepoName(name) {
+  if (typeof name !== 'string') {
+    return false
+  }
+
+  const trimmed = name.trim()
+
+  return (
+    trimmed.length > 0 &&
+    trimmed.length <= 100 &&
+    /^[A-Za-z0-9._-]+$/.test(trimmed) &&
+    !trimmed.startsWith('.') &&
+    !trimmed.endsWith('.') &&
+    !trimmed.endsWith('.git')
+  )
+}
 
 // This function will create a new repo on GitHub, export current project to that repo,
 // and link the repo with the project by saving sync status in database.
@@ -15,9 +31,17 @@ import logger from '@overleaf/logger'
 async function exportProjectToGithub(req, res, next) {
   const { Project_id: projectId, user_id: userId } = req.params
   const { name, description, private: isPrivate, org } = req.body
+  const normalizedName = typeof name === 'string' ? name.trim() : name
   // org can be optional
-  if (!projectId || !name || isPrivate === undefined) {
+  if (!projectId || !normalizedName || isPrivate === undefined) {
     return res.status(400).json({ error: 'Project_id, name and private are required' })
+  }
+
+  if (!isValidGitHubRepoName(normalizedName)) {
+    return res.status(400).json({
+      error:
+        'Invalid GitHub repository name. It must be 1-100 characters long and use only letters, numbers, periods (.), underscores (_), or hyphens (-). Do not include spaces or end with ".git".',
+    })
   }
 
   try {
@@ -27,7 +51,7 @@ async function exportProjectToGithub(req, res, next) {
     }
     const repoResult = await GithubSyncHandler.promises.createRepositoryOnGitHub(
       userId,
-      name,
+      normalizedName,
       description,
       isPrivate,
       org
