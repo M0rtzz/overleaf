@@ -303,6 +303,10 @@ module.exports = {
     // For legacy reasons, we need to populate the below objects.
     v1: {},
     recurly: {},
+
+    github_sync: {
+      url: `http://${process.env.GITHUB_SYNC_HOST || '127.0.0.1'}:${process.env.GITHUB_SYNC_PORT || 3022}`,
+    },
   },
 
   // Defines which features are allowed in the
@@ -1016,10 +1020,25 @@ module.exports = {
     mainEditorLayoutPanels: [],
     langFeedbackLinkingWidgets: [],
     labsExperiments: [],
-    integrationLinkingWidgets: [],
+    integrationLinkingWidgets: [
+      Path.resolve(
+        __dirname,
+        '../modules/github-sync/frontend/js/components/github-sync-widget.tsx'
+      ),
+    ],
     referenceLinkingWidgets: [],
-    importProjectFromGithubModalWrapper: [],
-    importProjectFromGithubMenu: [],
+    importProjectFromGithubModalWrapper: [
+      Path.resolve(
+        __dirname,
+        '../modules/github-sync/frontend/js/components/import-from-github-modal-wrapper.tsx'
+      ),
+    ],
+    importProjectFromGithubMenu: [
+      Path.resolve(
+        __dirname,
+        '../modules/github-sync/frontend/js/components/import-from-github-menu.tsx'
+      ),
+    ],
     editorLeftMenuSync: [
       Path.resolve(
         __dirname,
@@ -1085,6 +1104,10 @@ module.exports = {
         __dirname,
         '../modules/git-bridge/frontend/js/components/git-bridge-integration-card.tsx'
       ),
+      Path.resolve(
+        __dirname,
+        '../modules/github-sync/frontend/js/components/github-integration-card.tsx'
+      ),
     ],
     referenceSearchSetting: [],
     errorLogsComponents: [],
@@ -1110,6 +1133,7 @@ module.exports = {
     'login-register',
     'oauth2-server',
     'git-bridge',
+    'github-sync'
   ],
   viewIncludes: {},
 
@@ -1160,4 +1184,11 @@ module.exports.oauthProviders = {
       linkPath: '/oidc/login',
     },
   }),
+}
+
+module.exports.githubSync = {
+  enabled: process.env.GITHUB_SYNC_ENABLED === 'true',
+  clientID: process.env.GITHUB_SYNC_CLIENT_ID,
+  clientSecret: process.env.GITHUB_SYNC_CLIENT_SECRET,
+  callbackURL: process.env.GITHUB_SYNC_CALLBACK_URL,
 }
