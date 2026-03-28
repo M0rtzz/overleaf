@@ -97,7 +97,7 @@ export default function GitHubSyncWidget() {
             {error && <OLNotification type="error" content={error} />}
           </div>
         </div>
-        <div>
+        <div className="settings-widget-action">
           {status.enabled ? (
             <OLButton
               variant="danger-ghost"
